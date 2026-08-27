@@ -9,5 +9,11 @@ test("кликабельный тайм-код безопасен и досту�
   assert.match(script, /link\.target = "_blank"/);
   assert.match(script, /link\.rel = "noopener noreferrer"/);
   assert.match(script, /link\.setAttribute\("aria-label"/);
+  assert.match(script, /icon\.className = "analysis-timecode-icon"/);
+  assert.match(script, /icon\.setAttribute\("aria-hidden", "true"\)/);
+  assert.match(script, /label\.className = "analysis-timecode-label"/);
   assert.match(styles, /\.analysis-timecode:focus-visible/);
+  assert.match(styles, /li:has\(> \.analysis-timecode:hover\)/);
+  assert.match(styles, /\.analysis-timecode-icon/);
+  assert.match(styles, /transform: scaleX\(1\)/);
 });

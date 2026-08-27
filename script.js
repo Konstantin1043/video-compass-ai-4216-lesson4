@@ -413,7 +413,17 @@ function appendListItemContent(item, content, { linkTimecodes, videoId }) {
   link.target = "_blank";
   link.rel = "noopener noreferrer";
   link.setAttribute("aria-label", text("timecodeLink", { time: timestamp }));
-  link.textContent = `▶ ${timestamp}`;
+
+  const icon = document.createElement("span");
+  icon.className = "analysis-timecode-icon";
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = "▶";
+
+  const label = document.createElement("span");
+  label.className = "analysis-timecode-label";
+  label.textContent = timestamp;
+
+  link.append(icon, label);
   item.append(link);
 
   if (marker[2]) {

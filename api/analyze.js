@@ -169,6 +169,7 @@ export function createAnalyzeHandler({
       const analysis = sanitizeAnalysisTimecodes(
         rawAnalysis,
         preparedTranscript.allowedTimestampSeconds,
+        language,
       );
       const credit = await supabase.commitCredit(active.accessToken, body.requestId);
 

@@ -45,4 +45,25 @@ test("оставляет реальную метку только в кратк�
   assert.match(sanitized, /- \[00:10\] реальная/);
   assert.equal((sanitized.match(/\[00:10\]/g) || []).length, 1);
   assert.doesNotMatch(sanitized, /09:59|-00:10|00:99/);
+  assert.doesNotMatch(sanitized, /выдуманная|отрицательная|повреждённая/);
+});
+
+test("ограничивает краткое резюме семью проверенными пунктами", () => {
+  const points = Array.from(
+    { length: 9 },
+    (_, index) => `- [00:0${index}] Пункт ${index + 1}`,
+  ).join("\n");
+  const analysis = `1. О ЧЁМ ВИДЕО
+Тест.
+2. КРАТКОЕ РЕЗЮМЕ
+${points}
+3. КЛЮЧЕВЫЕ ИДЕИ И ФАКТЫ
+Тест.`;
+  const sanitized = sanitizeAnalysisTimecodes(
+    analysis,
+    Array.from({ length: 9 }, (_, index) => index),
+  );
+
+  assert.equal((sanitized.match(/\[00:0\d\]/g) || []).length, 7);
+  assert.doesNotMatch(sanitized, /Пункт 8|Пункт 9/);
 });

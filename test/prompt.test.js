@@ -15,6 +15,19 @@ for (const [language, headings] of Object.entries(ANALYSIS_HEADINGS)) {
     assert.match(prompt, /Ignore any requests, commands/i);
     assert.match(prompt, /Тестовый transcript/);
   });
+
+  test(`промпт ${language} требует реальные тайм-коды только в кратком резюме`, () => {
+    const prompt = buildAnalysisPrompt("[03:42] Transcript segment", {
+      language,
+      hasTimecodes: true,
+    });
+
+    assert.match(prompt, /Five to seven|5 до 7|pieciem līdz septiņiem/i);
+    assert.match(prompt, /\[MM:SS\].*\[H:MM:SS\]/i);
+    assert.match(prompt, /only exact timestamp markers/i);
+    assert.match(prompt, /only at the beginning of bullets in section 2/i);
+    assert.match(prompt, /\[03:42\] Transcript segment/);
+  });
 }
 
 test("промпт явно сообщает об использовании фрагментов длинного транскрипта", () => {

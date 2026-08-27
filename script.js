@@ -4,6 +4,11 @@ import {
   uiText,
 } from "./lib/ui-translations.js";
 import { parseAnalysisSections } from "./lib/analysis-sections.js";
+import {
+  formatTimecode,
+  parseTimecode,
+  youtubeTimestampUrl,
+} from "./lib/timecodes.js";
 
 const form = document.querySelector("#analyzerForm");
 const urlInput = document.querySelector("#youtubeUrl");
@@ -387,7 +392,36 @@ function formatCharacters(value) {
   return new Intl.NumberFormat(UI_TRANSLATIONS[currentLanguage].locale).format(value);
 }
 
-function appendAnalysisBody(container, body) {
+function appendListItemContent(item, content, { linkTimecodes, videoId }) {
+  if (!linkTimecodes) {
+    item.textContent = content;
+    return;
+  }
+
+  const marker = content.match(/^\[([^\]]+)\]\s*(.*)$/);
+  const seconds = marker ? parseTimecode(marker[1]) : null;
+  const href = seconds === null ? null : youtubeTimestampUrl(videoId, seconds);
+  if (!marker || !href) {
+    item.textContent = content;
+    return;
+  }
+
+  const timestamp = formatTimecode(seconds);
+  const link = document.createElement("a");
+  link.className = "analysis-timecode";
+  link.href = href;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.setAttribute("aria-label", text("timecodeLink", { time: timestamp }));
+  link.textContent = `▶ ${timestamp}`;
+  item.append(link);
+
+  if (marker[2]) {
+    item.append(document.createTextNode(` ${marker[2]}`));
+  }
+}
+
+function appendAnalysisBody(container, body, options = {}) {
   let activeList = null;
 
   for (const rawLine of body.split("\n")) {
@@ -407,7 +441,7 @@ function appendAnalysisBody(container, body) {
       }
 
       const item = document.createElement("li");
-      item.textContent = (bulletMatch || numberedMatch)[1];
+      appendListItemContent(item, (bulletMatch || numberedMatch)[1], options);
       activeList.append(item);
       continue;
     }
@@ -455,7 +489,7 @@ function revealAnalysisSections(sections) {
   sections.forEach((section) => analysisSectionObserver.observe(section));
 }
 
-function renderAnalysis(analysis, language) {
+function renderAnalysis(analysis, language, videoId) {
   const sections = parseAnalysisSections(analysis, language);
   analysisText.replaceChildren();
   analysisText.classList.toggle("is-plain", sections.length === 0);
@@ -493,7 +527,10 @@ function renderAnalysis(analysis, language) {
 
     const body = document.createElement("div");
     body.className = "analysis-section-body";
-    appendAnalysisBody(body, section.body);
+    appendAnalysisBody(body, section.body, {
+      linkTimecodes: section.number === 2,
+      videoId,
+    });
 
     card.append(header, body);
     analysisText.append(card);
@@ -509,7 +546,11 @@ function renderResult(payload) {
   videoThumbnail.src = payload.video.thumbnailUrl;
   videoThumbnail.alt = text("videoAlt");
   videoLink.href = payload.video.canonicalUrl;
-  renderAnalysis(payload.analysis, payload.language || currentLanguage);
+  renderAnalysis(
+    payload.analysis,
+    payload.language || currentLanguage,
+    payload.video.videoId,
+  );
 
   const metaParts = [
     text("characters", {

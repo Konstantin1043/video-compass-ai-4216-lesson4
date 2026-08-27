@@ -7,11 +7,12 @@ import {
   serverMessage,
 } from "../lib/language.js";
 import { PublicError } from "../lib/service-error.js";
+import { sanitizeAnalysisTimecodes } from "../lib/timecodes.js";
 import {
   createSupabaseService,
   SupabaseError,
 } from "../lib/supabase.js";
-import { prepareTranscript } from "../lib/transcript.js";
+import { prepareTranscriptData } from "../lib/transcript.js";
 import { parseYouTubeUrl } from "../lib/youtube.js";
 
 const MAX_BODY_CHARACTERS = 2_048;
@@ -158,12 +159,16 @@ export function createAnalyzeHandler({
         env.APIFY_API_TOKEN,
         video.canonicalUrl,
       );
-      const preparedTranscript = prepareTranscript(transcript);
-      const analysis = await analyzeTranscript(
+      const preparedTranscript = prepareTranscriptData(transcript);
+      const rawAnalysis = await analyzeTranscript(
         fetchImpl,
         env.GEMINI_API_KEY,
         preparedTranscript,
         language,
+      );
+      const analysis = sanitizeAnalysisTimecodes(
+        rawAnalysis,
+        preparedTranscript.allowedTimestampSeconds,
       );
       const credit = await supabase.commitCredit(active.accessToken, body.requestId);
 

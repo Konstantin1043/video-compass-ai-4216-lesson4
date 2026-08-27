@@ -117,6 +117,61 @@ test("полный поток Apify → Gemini возвращает резуль
   assert.doesNotMatch(calls[0].url, /apify-secret/);
 });
 
+test("передаёт Gemini сегменты и удаляет выдуманные тайм-коды", async () => {
+  const calls = [];
+  let geminiPrompt = "";
+  const handler = handlerWith({
+    env: { APIFY_API_TOKEN: "token", GEMINI_API_KEY: "key" },
+    fetchImpl: async (url, options) => {
+      calls.push(String(url));
+      if (String(url).includes("api.apify.com")) {
+        return Response.json([
+          {
+            transcript_only_text: "Первый фрагмент. Второй фрагмент.",
+            transcript: [
+              { text: "Первый фрагмент.", startMs: "10000", startTimeText: "0:10" },
+              { text: "Второй фрагмент.", startMs: "20000", startTimeText: "0:20" },
+            ],
+          },
+        ]);
+      }
+
+      geminiPrompt = JSON.parse(options.body).contents[0].parts[0].text;
+      return Response.json({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: `1. О ЧЁМ ВИДЕО
+Тест.
+2. КРАТКОЕ РЕЗЮМЕ
+- [00:10] Реальная метка.
+- [00:11] Выдуманная метка.
+3. КЛЮЧЕВЫЕ ИДЕИ И ФАКТЫ
+Тест.`,
+                },
+              ],
+            },
+          },
+        ],
+      });
+    },
+  });
+
+  const response = await handler(
+    request({ youtubeUrl: "https://youtu.be/dQw4w9WgXcQ" }),
+  );
+  const payload = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(calls.length, 2);
+  assert.match(geminiPrompt, /\[00:10\] Первый фрагмент/);
+  assert.match(geminiPrompt, /only exact timestamp markers/i);
+  assert.match(payload.analysis, /\[00:10\] Реальная/);
+  assert.doesNotMatch(payload.analysis, /00:11/);
+});
+
 test("передаёт английский язык в промпт Gemini и ответ API", async () => {
   let geminiPrompt = "";
   const handler = handlerWith({

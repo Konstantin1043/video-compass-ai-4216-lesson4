@@ -1,0 +1,15 @@
+{
+  "name": "video-compass-ai-4216-lesson4",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "VideoCompass AI — анализ YouTube-видео с регистрацией и ежедневными кредитами.",
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "test": "node --test",
+    "check": "npm test"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

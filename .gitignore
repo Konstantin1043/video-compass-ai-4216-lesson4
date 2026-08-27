@@ -1,0 +1,15 @@
+node_modules/
+.vercel/
+coverage/
+*.log
+
+# Секреты и локальные настройки
+.env
+.env.*
+!.env.example
+
+# Служебные файлы ОС и редакторов
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="ВидеоКомпас AI получает транскрипт YouTube-видео через Apify и превращает его в понятный разбор с помощью Gemini."
+    />
+    <meta name="theme-color" content="#f5f8fc" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="VideoCompass AI" />
+    <meta
+      property="og:description"
+      content="Понятный AI-разбор YouTube-видео по транскрипту."
+    />
+    <title>VideoCompass AI — разбор YouTube-видео</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/script.js" type="module"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#analyzer" data-i18n="skipLink">Перейти к анализатору</a>
+
+    <header class="site-header">
+      <a
+        class="brand"
+        href="#top"
+        aria-label="VideoCompass AI — на главную"
+        data-i18n-aria-label="brandHome"
+      >
+        <span class="brand-mark" aria-hidden="true">VC</span>
+        <span>VideoCompass <b>AI</b></span>
+      </a>
+      <span class="course-label" data-i18n="tagline">Экономьте время на просмотре</span>
+      <div class="header-tools">
+        <div
+          class="language-switcher"
+          role="group"
+          aria-label="Выбор языка"
+          data-i18n-aria-label="languageGroup"
+        >
+          <button type="button" data-language="ru" aria-label="Русский" title="Русский">RU</button>
+          <button type="button" data-language="en" aria-label="English" title="English">EN</button>
+          <button type="button" data-language="lv" aria-label="Latviešu" title="Latviešu">LV</button>
+        </div>
+        <button class="header-login" id="openAuthButton" type="button" data-i18n="signIn">
+          Войти
+        </button>
+        <div class="user-panel" id="userPanel" hidden>
+          <span class="credit-badge" id="creditBadge" aria-live="polite"></span>
+          <span class="user-email" id="userEmail"></span>
+          <button class="header-logout" id="logoutButton" type="button" data-i18n="signOut">
+            Выйти
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="heroEyebrow">Смотрите осознанно</p>
+          <h1 id="hero-title" data-i18n="heroTitle">
+            Краткое содержание и обзор YouTube-видео
+          </h1>
+          <p class="hero-lead" data-i18n="heroLead">
+            Вставьте ссылку — сервис получит доступные субтитры, выделит главное,
+            оценит пользу ролика и предложит практические действия.
+          </p>
+          <ul
+            class="benefits"
+            aria-label="Преимущества сервиса"
+            data-i18n-aria-label="benefitsLabel"
+          >
+            <li data-i18n="benefitSummary">Краткое резюме</li>
+            <li data-i18n="benefitScore">Оценка пользы</li>
+            <li data-i18n="benefitQuestions">Вопросы для самопроверки</li>
+          </ul>
+        </div>
+
+        <div class="hero-aside" aria-hidden="true">
+          <div class="compass-card">
+            <span class="compass-ring"><i></i></span>
+            <p data-i18n="heroFrom">От ссылки</p>
+            <strong data-i18n="heroTo">к ясному выводу</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="analyzer-shell" id="analyzer" aria-labelledby="analyzer-title">
+        <div class="analyzer-heading">
+          <div>
+            <p class="section-number">01</p>
+            <h2 id="analyzer-title" data-i18n="analyzerTitle">Ссылка на видео</h2>
+          </div>
+          <p data-i18n="analyzerSupport">Поддерживаются обычные ролики, Shorts и записи трансляций.</p>
+        </div>
+
+        <div class="auth-gate" id="authGate" role="status">
+          <span class="auth-gate-icon" aria-hidden="true">✦</span>
+          <div>
+            <strong id="authGateTitle" data-i18n="authGateTitle">10 бесплатных анализов каждый день</strong>
+            <p id="authGateText" data-i18n="authGateText">Войдите или зарегистрируйтесь, чтобы начать.</p>
+          </div>
+          <button class="secondary-button" id="gateAuthButton" type="button" data-i18n="signInOrRegister">
+            Войти или зарегистрироваться
+          </button>
+        </div>
+
+        <form class="analyzer-form is-locked" id="analyzerForm" novalidate>
+          <label for="youtubeUrl" data-i18n="urlLabel">YouTube‑ссылка</label>
+          <div class="input-row">
+            <input
+              id="youtubeUrl"
+              name="youtubeUrl"
+              type="url"
+              inputmode="url"
+              autocomplete="url"
+              maxlength="500"
+              placeholder="https://www.youtube.com/watch?v=..."
+              aria-describedby="urlHelp"
+              required
+            />
+            <button class="primary-button" id="submitButton" type="submit">
+              <span data-i18n="analyzeButton">Проанализировать</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+          <p class="form-help" id="urlHelp" data-i18n="urlHelp">
+            Видео должно быть публичным и иметь ручные или автоматические субтитры.
+          </p>
+        </form>
+
+        <div class="error-message" id="errorMessage" role="alert" hidden>
+          <span aria-hidden="true">!</span>
+          <p id="errorText"></p>
+        </div>
+
+        <div class="progress-panel" id="progressPanel" aria-live="polite" hidden>
+          <div class="spinner" aria-hidden="true"></div>
+          <div>
+            <p class="progress-title" id="progressTitle" data-i18n="progressOne">Проверяем ссылку…</p>
+            <ol
+              class="progress-steps"
+              aria-label="Этапы анализа"
+              data-i18n-aria-label="progressStepsLabel"
+            >
+              <li id="progressStep1" data-i18n="progressStepOne">Проверка YouTube‑ссылки</li>
+              <li id="progressStep2" data-i18n="progressStepTwo">Получение транскрипта через Apify</li>
+              <li id="progressStep3" data-i18n="progressStepThree">Анализ текста с помощью Gemini</li>
+            </ol>
+          </div>
+        </div>
+
+        <article class="result" id="result" aria-labelledby="result-title" hidden>
+          <header class="result-header">
+            <div>
+              <p class="section-number">02</p>
+              <h2 id="result-title" data-i18n="resultTitle">Результат анализа</h2>
+            </div>
+            <button class="secondary-button" id="copyButton" type="button" data-i18n="copyButton">
+              Скопировать
+            </button>
+          </header>
+
+          <div class="video-summary">
+            <img id="videoThumbnail" alt="" width="480" height="360" />
+            <div>
+              <p class="video-label" data-i18n="sourceVideo">Исходное видео</p>
+              <a
+                id="videoLink"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-i18n="openYouTube"
+              >
+                Открыть на YouTube ↗
+              </a>
+              <p class="transcript-meta" id="transcriptMeta"></p>
+            </div>
+          </div>
+
+          <div class="analysis-toolbar" id="analysisToolbar" hidden>
+            <p data-i18n="analysisHint">
+              Нажмите на заголовок, чтобы свернуть или раскрыть раздел.
+            </p>
+            <div
+              class="analysis-controls"
+              role="group"
+              aria-label="Управление разделами анализа"
+              data-i18n-aria-label="analysisControls"
+            >
+              <button
+                class="section-control"
+                id="collapseAllButton"
+                type="button"
+                aria-controls="analysisText"
+              >
+                <span aria-hidden="true">−</span>
+                <span data-i18n="collapseAll">Свернуть все</span>
+              </button>
+              <button
+                class="section-control"
+                id="expandAllButton"
+                type="button"
+                aria-controls="analysisText"
+              >
+                <span aria-hidden="true">+</span>
+                <span data-i18n="expandAll">Раскрыть все</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="analysis-text" id="analysisText"></div>
+
+          <button class="text-button" id="newAnalysisButton" type="button" data-i18n="newAnalysis">
+            ← Проанализировать другое видео
+          </button>
+        </article>
+      </section>
+
+      <section class="how-it-works" aria-labelledby="how-title">
+        <div class="section-intro">
+          <p class="eyebrow" data-i18n="processEyebrow">Прозрачный процесс</p>
+          <h2 id="how-title" data-i18n="processTitle">Как это работает</h2>
+        </div>
+        <ol class="process-list">
+          <li>
+            <span>1</span>
+            <div>
+              <h3 data-i18n="processOneTitle">Проверяем ссылку</h3>
+              <p data-i18n="processOneText">Принимаем только одну корректную ссылку на публичный YouTube‑ролик.</p>
+            </div>
+          </li>
+          <li>
+            <span>2</span>
+            <div>
+              <h3 data-i18n="processTwoTitle">Получаем текст</h3>
+              <p data-i18n="processTwoText">Apify извлекает доступные субтитры, не передавая секретный ключ браузеру.</p>
+            </div>
+          </li>
+          <li>
+            <span>3</span>
+            <div>
+              <h3 data-i18n="processThreeTitle">Выделяем главное</h3>
+              <p data-i18n="processThreeText">Gemini анализирует транскрипт по единому проверяемому шаблону.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p data-i18n="footerProject">VideoCompass AI · учебный некоммерческий проект</p>
+      <p data-i18n="footerDisclaimer">Результат AI может содержать неточности — сверяйте важные выводы с оригиналом.</p>
+    </footer>
+
+    <dialog class="auth-dialog" id="authDialog" aria-labelledby="authTitle">
+      <div class="auth-dialog-card">
+        <button
+          class="dialog-close"
+          id="closeAuthButton"
+          type="button"
+          aria-label="Закрыть"
+          data-i18n-aria-label="closeDialog"
+        >
+          ×
+        </button>
+        <p class="section-number">VideoCompass AI</p>
+        <h2 id="authTitle" data-i18n="authTitle">Добро пожаловать</h2>
+        <p class="auth-intro" data-i18n="authIntro">
+          Создайте бесплатный аккаунт и получайте 10 анализов каждый день.
+        </p>
+
+        <div class="auth-tabs" role="tablist" aria-label="Вход или регистрация" data-i18n-aria-label="authTabs">
+          <button id="loginTab" type="button" role="tab" aria-selected="true" aria-controls="authForm" data-auth-mode="login" data-i18n="signIn">
+            Войти
+          </button>
+          <button id="registerTab" type="button" role="tab" aria-selected="false" aria-controls="authForm" data-auth-mode="register" data-i18n="register">
+            Регистрация
+          </button>
+        </div>
+
+        <form class="auth-form" id="authForm" novalidate>
+          <label for="authEmail" data-i18n="emailLabel">Электронная почта</label>
+          <input id="authEmail" name="email" type="email" autocomplete="email" maxlength="254" required />
+
+          <label for="authPassword" data-i18n="passwordLabel">Пароль</label>
+          <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required aria-describedby="passwordHelp" />
+          <p id="passwordHelp" data-i18n="passwordHelp">Не менее 8 символов.</p>
+
+          <div class="auth-error" id="authError" role="alert" hidden></div>
+          <button class="primary-button auth-submit" id="authSubmitButton" type="submit">
+            <span data-i18n="signIn">Войти</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <p class="auth-note" data-i18n="authNote">
+          Не используйте пароль от почты или других важных сервисов.
+        </p>
+      </div>
+    </dialog>
+  </body>
+</html>

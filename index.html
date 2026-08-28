@@ -16,7 +16,7 @@
     />
     <title>VideoCompass AI — разбор YouTube-видео</title>
     <link rel="stylesheet" href="/styles.css" />
-    <script src="/script.js" type="module"></script>
+    <script src="/app-v21.js" type="module"></script>
   </head>
   <body>
     <a class="skip-link" href="#analyzer" data-i18n="skipLink">Перейти к анализатору</a>
@@ -49,6 +49,9 @@
         <div class="user-panel" id="userPanel" hidden>
           <span class="credit-badge" id="creditBadge" aria-live="polite"></span>
           <span class="user-email" id="userEmail"></span>
+          <button class="header-history" id="historyButton" type="button" data-i18n="historyTitle">
+            История
+          </button>
           <button class="header-logout" id="logoutButton" type="button" data-i18n="signOut">
             Выйти
           </button>
@@ -76,6 +79,10 @@
             <li data-i18n="benefitScore">Оценка пользы</li>
             <li data-i18n="benefitQuestions">Вопросы для самопроверки</li>
           </ul>
+          <div class="hero-actions">
+            <a class="primary-button hero-cta" href="#analyzer" data-i18n="tryFree">Попробовать бесплатно <span aria-hidden="true">→</span></a>
+            <button class="secondary-button" id="demoButton" type="button" data-i18n="showDemo">Посмотреть пример</button>
+          </div>
         </div>
 
         <div class="hero-aside" aria-hidden="true">
@@ -107,7 +114,7 @@
           </button>
         </div>
 
-        <form class="analyzer-form is-locked" id="analyzerForm" novalidate>
+        <form class="analyzer-form" id="analyzerForm" novalidate>
           <label for="youtubeUrl" data-i18n="urlLabel">YouTube‑ссылка</label>
           <div class="input-row">
             <input
@@ -158,15 +165,33 @@
               <p class="section-number">02</p>
               <h2 id="result-title" data-i18n="resultTitle">Результат анализа</h2>
             </div>
-            <button class="secondary-button" id="copyButton" type="button" data-i18n="copyButton">
-              Скопировать
-            </button>
+            <div class="result-actions">
+              <button class="secondary-button" id="favoriteButton" type="button" aria-pressed="false" data-i18n="favoriteAdd">В избранное</button>
+              <details class="export-menu">
+                <summary class="secondary-button" data-i18n="exportMenu">Экспорт и ссылка</summary>
+                <div class="export-menu-popover">
+                  <button id="copyButton" type="button" data-i18n="copyButton">Скопировать текст</button>
+                  <button id="textButton" type="button" data-i18n="downloadText">Скачать текст</button>
+                  <button id="markdownButton" type="button" data-i18n="downloadMarkdown">Скачать Markdown</button>
+                  <button id="pdfButton" type="button" data-i18n="downloadPdf">Скачать PDF</button>
+                  <button id="shareButton" type="button" data-i18n="createShare">Создать публичную ссылку</button>
+                  <button id="revokeShareButton" type="button" data-i18n="revokeShare" hidden>Отозвать публичную ссылку</button>
+                  <button class="danger-menu-item" id="deleteAnalysisButton" type="button" data-i18n="deleteAnalysis">Удалить анализ</button>
+                </div>
+              </details>
+            </div>
           </header>
 
-          <div class="video-summary">
+          <div class="result-overview">
             <img id="videoThumbnail" alt="" width="480" height="360" />
-            <div>
+            <div class="overview-copy">
               <p class="video-label" data-i18n="sourceVideo">Исходное видео</p>
+              <h3 id="videoTitle"></h3>
+              <p class="video-author" id="videoAuthor"></p>
+              <div class="score-row">
+                <strong id="overviewScore"></strong>
+                <p id="overviewAbout"></p>
+              </div>
               <a
                 id="videoLink"
                 href="#"
@@ -177,9 +202,17 @@
                 Открыть на YouTube ↗
               </a>
               <p class="transcript-meta" id="transcriptMeta"></p>
+              <p class="evidence-note" data-i18n="evidenceNote">Сомнительные утверждения оцениваются только по транскрипту, без проверки в интернете.</p>
             </div>
           </div>
 
+          <div class="result-tabs" role="tablist" aria-label="Разделы результата" data-i18n-aria-label="resultTabsLabel">
+            <button id="analysisTab" type="button" role="tab" aria-selected="true" aria-controls="analysisPanel" data-result-tab="analysis" data-i18n="analysisTab">Анализ</button>
+            <button id="transcriptTab" type="button" role="tab" aria-selected="false" aria-controls="transcriptPanel" data-result-tab="transcript" data-i18n="transcriptTab">Транскрипт</button>
+            <button id="chaptersTab" type="button" role="tab" aria-selected="false" aria-controls="chaptersPanel" data-result-tab="chapters" data-i18n="chaptersTab">Главы</button>
+          </div>
+
+          <section id="analysisPanel" class="result-tab-panel" role="tabpanel" aria-labelledby="analysisTab">
           <div class="analysis-toolbar" id="analysisToolbar" hidden>
             <p data-i18n="analysisHint">
               Нажмите на заголовок, чтобы свернуть или раскрыть раздел.
@@ -212,11 +245,55 @@
           </div>
 
           <div class="analysis-text" id="analysisText"></div>
+          </section>
+
+          <section id="transcriptPanel" class="result-tab-panel" role="tabpanel" aria-labelledby="transcriptTab" hidden>
+            <div class="transcript-searchbar">
+              <label for="transcriptSearch" data-i18n="transcriptSearchLabel">Поиск по транскрипту</label>
+              <div class="transcript-search-row">
+                <input id="transcriptSearch" type="search" autocomplete="off" data-i18n-placeholder="transcriptSearchPlaceholder" placeholder="Введите слово или фразу" />
+                <span id="transcriptMatchCount" aria-live="polite"></span>
+                <button id="previousMatchButton" type="button" aria-label="Предыдущее совпадение" data-i18n-aria-label="previousMatch">↑</button>
+                <button id="nextMatchButton" type="button" aria-label="Следующее совпадение" data-i18n-aria-label="nextMatch">↓</button>
+              </div>
+            </div>
+            <div class="transcript-view" id="transcriptView"></div>
+            <button class="secondary-button" id="loadMoreTranscriptButton" type="button" data-i18n="loadMoreTranscript" hidden>Показать ещё</button>
+          </section>
+
+          <section id="chaptersPanel" class="result-tab-panel" role="tabpanel" aria-labelledby="chaptersTab" hidden>
+            <ol class="chapters-list" id="chaptersList"></ol>
+          </section>
+
+          <div class="share-confirmation" id="shareConfirmation" role="status" hidden>
+            <span data-i18n="shareReady">Публичная ссылка создана:</span>
+            <a id="shareLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+            <button id="copyShareButton" type="button" data-i18n="copyLink">Копировать ссылку</button>
+          </div>
 
           <button class="text-button" id="newAnalysisButton" type="button" data-i18n="newAnalysis">
             ← Проанализировать другое видео
           </button>
         </article>
+      </section>
+
+      <section class="history-section" id="historySection" aria-labelledby="historyTitle" hidden>
+        <div class="section-intro history-intro">
+          <p class="eyebrow" data-i18n="historyEyebrow">Личная библиотека</p>
+          <h2 id="historyTitle" data-i18n="historyTitle">История</h2>
+          <p data-i18n="historyRetention">До 30 последних анализов хранятся 30 дней. Избранные сохраняются дольше.</p>
+        </div>
+        <div class="history-controls">
+          <input id="historySearch" type="search" data-i18n-placeholder="historySearchPlaceholder" placeholder="Название или ссылка" />
+          <select id="historyLanguageFilter" aria-label="Фильтр языка" data-i18n-aria-label="historyLanguageFilter">
+            <option value="all" data-i18n="allLanguages">Все языки</option>
+            <option value="ru">RU</option><option value="en">EN</option><option value="lv">LV</option>
+          </select>
+          <label><input id="favoritesOnly" type="checkbox" /> <span data-i18n="favoritesOnly">Только избранные</span></label>
+        </div>
+        <div class="history-list" id="historyList"></div>
+        <p class="history-empty" id="historyEmpty" data-i18n="historyEmpty" hidden>Сохранённых анализов пока нет.</p>
+        <button class="text-button danger-text" id="deleteAccountButton" type="button" data-i18n="deleteAccount">Удалить аккаунт и все данные</button>
       </section>
 
       <section class="how-it-works" aria-labelledby="how-title">
@@ -253,6 +330,7 @@
     <footer class="site-footer">
       <p data-i18n="footerProject">VideoCompass AI · учебный некоммерческий проект</p>
       <p data-i18n="footerDisclaimer">Результат AI может содержать неточности — сверяйте важные выводы с оригиналом.</p>
+      <a href="/privacy.html" data-i18n="privacyLink">Конфиденциальность</a>
     </footer>
 
     <dialog class="auth-dialog" id="authDialog" aria-labelledby="authTitle">
@@ -286,8 +364,13 @@
           <input id="authEmail" name="email" type="email" autocomplete="email" maxlength="254" required />
 
           <label for="authPassword" data-i18n="passwordLabel">Пароль</label>
-          <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required aria-describedby="passwordHelp" />
+          <div class="password-field">
+            <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required aria-describedby="passwordHelp" />
+            <button id="togglePasswordButton" type="button" aria-label="Показать пароль" data-i18n-aria-label="showPassword">Показать</button>
+          </div>
           <p id="passwordHelp" data-i18n="passwordHelp">Не менее 8 символов.</p>
+
+          <div id="turnstileWidget" class="turnstile-widget" hidden></div>
 
           <div class="auth-error" id="authError" role="alert" hidden></div>
           <button class="primary-button auth-submit" id="authSubmitButton" type="submit">
@@ -300,6 +383,21 @@
           Не используйте пароль от почты или других важных сервисов.
         </p>
       </div>
+    </dialog>
+
+    <dialog class="confirm-dialog" id="deleteAccountDialog" aria-labelledby="deleteAccountTitle">
+      <form method="dialog" class="confirm-dialog-card" id="deleteAccountForm">
+        <h2 id="deleteAccountTitle" data-i18n="deleteAccountTitle">Удалить аккаунт?</h2>
+        <p data-i18n="deleteAccountText">История, избранное и публичные ссылки будут удалены без возможности восстановления.</p>
+        <label for="deleteAccountPassword" data-i18n="confirmPassword">Введите пароль для подтверждения</label>
+        <input id="deleteAccountPassword" type="password" autocomplete="current-password" minlength="8" required />
+        <div id="deleteTurnstileWidget" class="turnstile-widget" hidden></div>
+        <div class="auth-error" id="deleteAccountError" role="alert" hidden></div>
+        <div class="confirm-actions">
+          <button class="secondary-button" value="cancel" type="button" id="cancelDeleteAccount" data-i18n="cancel">Отмена</button>
+          <button class="danger-button" type="submit" data-i18n="deleteForever">Удалить навсегда</button>
+        </div>
+      </form>
     </dialog>
   </body>
 </html>

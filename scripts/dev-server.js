@@ -3,28 +3,55 @@ import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import analyzeFunction from "../api/analyze.js";
+import deleteAccountFunction from "../api/account/delete.js";
+import historyFunction from "../api/analysis/history.js";
+import startAnalysisFunction from "../api/analysis/start.js";
+import statusAnalysisFunction from "../api/analysis/status.js";
+import stepAnalysisFunction from "../api/analysis/step.js";
 import loginFunction from "../api/auth/login.js";
 import logoutFunction from "../api/auth/logout.js";
 import registerFunction from "../api/auth/register.js";
 import sessionFunction from "../api/auth/session.js";
+import configFunction from "../api/config.js";
+import cleanupFunction from "../api/cron/cleanup.js";
+import pdfFunction from "../api/export/pdf.js";
+import healthFunction from "../api/health.js";
+import shareFunction from "../api/share.js";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const port = Number(process.env.PORT || 3000);
+const port = Number(process.argv[2] || process.env.PORT || 3000);
 const staticFiles = new Map([
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/index.html", ["index.html", "text/html; charset=utf-8"]],
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
   ["/script.js", ["script.js", "text/javascript; charset=utf-8"]],
+  ["/app-v21.js", ["app-v21.js", "text/javascript; charset=utf-8"]],
+  ["/privacy.html", ["privacy.html", "text/html; charset=utf-8"]],
+  ["/privacy.js", ["privacy.js", "text/javascript; charset=utf-8"]],
+  ["/share.html", ["share.html", "text/html; charset=utf-8"]],
+  ["/share.js", ["share.js", "text/javascript; charset=utf-8"]],
   ["/lib/analysis-sections.js", ["lib/analysis-sections.js", "text/javascript; charset=utf-8"]],
   ["/lib/language.js", ["lib/language.js", "text/javascript; charset=utf-8"]],
+  ["/lib/structured-analysis.js", ["lib/structured-analysis.js", "text/javascript; charset=utf-8"]],
+  ["/lib/timecodes.js", ["lib/timecodes.js", "text/javascript; charset=utf-8"]],
   ["/lib/ui-translations.js", ["lib/ui-translations.js", "text/javascript; charset=utf-8"]],
 ]);
 const apiFunctions = new Map([
   ["/api/analyze", analyzeFunction],
+  ["/api/account/delete", deleteAccountFunction],
+  ["/api/analysis/history", historyFunction],
+  ["/api/analysis/start", startAnalysisFunction],
+  ["/api/analysis/status", statusAnalysisFunction],
+  ["/api/analysis/step", stepAnalysisFunction],
   ["/api/auth/login", loginFunction],
   ["/api/auth/logout", logoutFunction],
   ["/api/auth/register", registerFunction],
   ["/api/auth/session", sessionFunction],
+  ["/api/config", configFunction],
+  ["/api/cron/cleanup", cleanupFunction],
+  ["/api/export/pdf", pdfFunction],
+  ["/api/health", healthFunction],
+  ["/api/share", shareFunction],
 ]);
 
 async function readBody(request) {
@@ -80,7 +107,10 @@ const server = http.createServer(async (request, response) => {
       return;
     }
 
-    const staticFile = staticFiles.get(pathname);
+    const shareRoute = pathname.match(/^\/share\/[A-Za-z0-9_-]{32}$/);
+    const staticFile = shareRoute
+      ? ["share.html", "text/html; charset=utf-8"]
+      : staticFiles.get(pathname);
     if (!staticFile) {
       response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
       response.end("Страница не найдена");

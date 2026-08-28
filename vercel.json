@@ -4,17 +4,42 @@
     "api/analyze.js": {
       "maxDuration": 120
     },
+    "api/analysis/*.js": {
+      "maxDuration": 90
+    },
+    "api/export/pdf.js": {
+      "maxDuration": 30,
+      "includeFiles": "node_modules/dejavu-fonts-ttf/ttf/**"
+    },
     "api/auth/*.js": {
       "maxDuration": 20
+    },
+    "api/account/*.js": {
+      "maxDuration": 25
+    },
+    "api/cron/*.js": {
+      "maxDuration": 30
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/cleanup",
+      "schedule": "0 3 * * *"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/share/:token",
+      "destination": "/share.html?token=:token"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; img-src 'self' https://i.ytimg.com data:; connect-src 'self'; script-src 'self'; style-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+          "value": "default-src 'self'; img-src 'self' https://i.ytimg.com data:; connect-src 'self' https://challenges.cloudflare.com; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; frame-src https://challenges.cloudflare.com; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
         },
         {
           "key": "X-Content-Type-Options",
@@ -27,6 +52,10 @@
         {
           "key": "Permissions-Policy",
           "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
         }
       ]
     }

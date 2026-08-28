@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content="Shared VideoCompass AI analysis." />
+    <title>VideoCompass AI — shared analysis</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/share.js" type="module"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="VideoCompass AI">
+        <span class="brand-mark" aria-hidden="true">VC</span>
+        <span>VideoCompass <b>AI</b></span>
+      </a>
+      <a class="secondary-button" href="/">Open service</a>
+    </header>
+    <main class="shared-page">
+      <section class="analyzer-shell" aria-labelledby="sharedTitle">
+        <p class="section-number">PUBLIC</p>
+        <h1 id="sharedTitle">Shared analysis</h1>
+        <div class="progress-panel" id="sharedLoading"><div class="spinner" aria-hidden="true"></div><p>Loading…</p></div>
+        <div class="error-message" id="sharedError" role="alert" hidden><span aria-hidden="true">!</span><p></p></div>
+        <article id="sharedResult" hidden>
+          <div class="result-overview">
+            <img id="sharedThumbnail" alt="" width="480" height="360" />
+            <div class="overview-copy">
+              <p class="video-label">YouTube</p>
+              <h2 id="sharedVideoTitle"></h2>
+              <p class="video-author" id="sharedAuthor"></p>
+              <div class="score-row"><strong id="sharedScore"></strong><p id="sharedAbout"></p></div>
+              <a id="sharedVideoLink" href="#" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
+            </div>
+          </div>
+          <div class="analysis-text" id="sharedAnalysis"></div>
+          <p class="shared-expiry" id="sharedExpiry"></p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
+

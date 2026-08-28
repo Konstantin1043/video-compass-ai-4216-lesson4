@@ -6,13 +6,15 @@ import {
   requestLanguage,
   serverMessage,
 } from "./helpers.js";
+import { validateMutationRequest } from "../../lib/security.js";
 
 export function createLogoutHandler({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
   return async function logout(request) {
     const language = requestLanguage(request);
-    if (request.method !== "POST") {
-      return errorResponse(language, "METHOD_NOT_ALLOWED", 405, serverMessage, {
-        headers: { Allow: "POST" },
+    const securityError = validateMutationRequest(request);
+    if (securityError) {
+      return errorResponse(language, securityError, securityError === "METHOD_NOT_ALLOWED" ? 405 : securityError === "UNSUPPORTED_MEDIA_TYPE" ? 415 : 403, serverMessage, {
+        ...(securityError === "METHOD_NOT_ALLOWED" ? { headers: { Allow: "POST" } } : {}),
       });
     }
 

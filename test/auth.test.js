@@ -3,6 +3,7 @@ import test from "node:test";
 import { createLoginHandler } from "../api/auth/login.js";
 import { createRegisterHandler } from "../api/auth/register.js";
 import { createSessionHandler } from "../api/auth/session.js";
+import { createSupabaseService } from "../lib/supabase.js";
 
 const env = {
   SUPABASE_URL: "https://example.supabase.co",
@@ -120,4 +121,24 @@ test("невалидные регистрационные данные не от
   assert.equal(response.status, 400);
   assert.equal(payload.error.code, "INVALID_EMAIL");
   assert.match(payload.error.message, /e-pasta/i);
+});
+
+test("Supabase-ключи очищаются от случайных переносов строки", async () => {
+  let requestHeaders;
+  const service = createSupabaseService({
+    env: {
+      SUPABASE_URL: "\r\n https://example.supabase.co \r\n",
+      SUPABASE_PUBLISHABLE_KEY: "\r\n publishable-test-key \r\n",
+      SUPABASE_SECRET_KEY: "\r\n sb_secret_test \r\n",
+    },
+    fetchImpl: async (_url, options) => {
+      requestHeaders = options.headers;
+      return Response.json([{ allowed: true }]);
+    },
+  });
+
+  await service.serviceRpc("consume_rate_limit", {});
+
+  assert.equal(requestHeaders.apikey, "sb_secret_test");
+  assert.equal(requestHeaders.Authorization, "Bearer sb_secret_test");
 });

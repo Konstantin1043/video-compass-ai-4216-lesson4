@@ -20,11 +20,28 @@ function result(language) {
   };
 }
 
+function countPages(buffer) {
+  return (buffer.toString("latin1").match(/\/Type\s*\/Page(?!s)\b/g) || []).length;
+}
+
 for (const language of ["ru", "en", "lv"]) {
   test(`PDF ${language.toUpperCase()} создаётся с внедрённым шрифтом`, async () => {
     const buffer = await createAnalysisPdf(result(language));
     assert.equal(buffer.subarray(0, 5).toString(), "%PDF-");
     assert.ok(buffer.length > 3_000);
     assert.match(buffer.toString("latin1"), /DejaVuSans/i);
+    assert.equal(countPages(buffer), 1);
   });
 }
+
+test("длинный PDF переносится на несколько страниц без лишней пары страниц", async () => {
+  const fixture = result("ru");
+  const paragraph = "Подробный фрагмент анализа с полезными выводами и практическими пояснениями. ".repeat(18);
+  fixture.analysis.about = paragraph;
+  fixture.analysis.keyIdeas = Array.from({ length: 16 }, (_, index) => `${index + 1}. ${paragraph}`);
+  fixture.analysis.actions = Array.from({ length: 12 }, (_, index) => `Действие ${index + 1}: ${paragraph}`);
+  const buffer = await createAnalysisPdf(fixture);
+  const pages = countPages(buffer);
+  assert.ok(pages > 1);
+  assert.ok(pages < 20);
+});

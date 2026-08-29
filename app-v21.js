@@ -16,15 +16,14 @@ const elements = {
   analysisText: $("#analysisText"), analysisToolbar: $("#analysisToolbar"),
   collapseAll: $("#collapseAllButton"), expandAll: $("#expandAllButton"),
   favorite: $("#favoriteButton"), copy: $("#copyButton"), textDownload: $("#textButton"), markdown: $("#markdownButton"),
-  pdf: $("#pdfButton"), share: $("#shareButton"), revokeShare: $("#revokeShareButton"),
+  pdf: $("#pdfButton"), exportMenu: $("#exportMenu"),
   deleteAnalysis: $("#deleteAnalysisButton"), newAnalysis: $("#newAnalysisButton"),
   resultTabs: $$('[data-result-tab]'), analysisPanel: $("#analysisPanel"),
   transcriptPanel: $("#transcriptPanel"), chaptersPanel: $("#chaptersPanel"),
   transcriptSearch: $("#transcriptSearch"), transcriptCount: $("#transcriptMatchCount"),
   previousMatch: $("#previousMatchButton"), nextMatch: $("#nextMatchButton"),
   transcriptView: $("#transcriptView"), loadMoreTranscript: $("#loadMoreTranscriptButton"),
-  chapters: $("#chaptersList"), shareConfirmation: $("#shareConfirmation"),
-  shareLink: $("#shareLink"), copyShare: $("#copyShareButton"),
+  chapters: $("#chaptersList"),
   authGate: $("#authGate"), authGateTitle: $("#authGateTitle"), authGateText: $("#authGateText"),
   openAuth: $("#openAuthButton"), gateAuth: $("#gateAuthButton"), userPanel: $("#userPanel"),
   userEmail: $("#userEmail"), creditBadge: $("#creditBadge"), logout: $("#logoutButton"),
@@ -34,8 +33,9 @@ const elements = {
   authModes: $$('[data-auth-mode]'), togglePassword: $("#togglePasswordButton"),
   turnstile: $("#turnstileWidget"), historyButton: $("#historyButton"),
   historySection: $("#historySection"), historySearch: $("#historySearch"),
-  historyLanguage: $("#historyLanguageFilter"), favoritesOnly: $("#favoritesOnly"),
+  favoritesOnly: $("#favoritesOnly"), historyStatus: $("#historyStatus"),
   historyList: $("#historyList"), historyEmpty: $("#historyEmpty"), demo: $("#demoButton"),
+  siteHeader: $("#siteHeader"),
   deleteAccount: $("#deleteAccountButton"), deleteAccountDialog: $("#deleteAccountDialog"),
   deleteAccountForm: $("#deleteAccountForm"), deleteAccountPassword: $("#deleteAccountPassword"),
   deleteAccountError: $("#deleteAccountError"), cancelDeleteAccount: $("#cancelDeleteAccount"),
@@ -65,6 +65,7 @@ const state = {
   deleteCaptchaToken: "",
   deleteTurnstileWidgetId: null,
   demo: false,
+  historyStatusTimer: null,
 };
 
 function safeStorageGet(key) {
@@ -122,6 +123,28 @@ function clearError() {
   elements.errorText.textContent = "";
   elements.error.hidden = true;
   elements.url.removeAttribute("aria-invalid");
+}
+
+function showHistoryStatus(message, isError = false) {
+  clearTimeout(state.historyStatusTimer);
+  elements.historyStatus.textContent = message;
+  elements.historyStatus.classList.toggle("is-error", isError);
+  elements.historyStatus.setAttribute("role", isError ? "alert" : "status");
+  elements.historyStatus.hidden = false;
+  state.historyStatusTimer = setTimeout(() => {
+    elements.historyStatus.hidden = true;
+  }, 3_500);
+}
+
+function setActionBusy(button, busy, busyLabel, readyLabel) {
+  button.disabled = busy;
+  button.classList.toggle("is-loading", busy);
+  button.setAttribute("aria-busy", String(busy));
+  button.textContent = busy ? busyLabel : readyLabel;
+}
+
+function wait(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 async function readApi(response) {
@@ -457,7 +480,6 @@ function clearCurrentResult() {
   state.currentResult = null;
   state.demo = false;
   elements.result.hidden = true;
-  elements.shareConfirmation.hidden = true;
 }
 
 function renderResult(job, result) {
@@ -475,8 +497,6 @@ function renderResult(job, result) {
   elements.transcriptMeta.textContent = `${text("characters", { count })}${result.transcript?.shortened ? ` · ${text("shortened")}` : ""}`;
   elements.favorite.hidden = state.demo;
   elements.pdf.disabled = state.demo;
-  elements.share.disabled = state.demo;
-  elements.revokeShare.hidden = true;
   elements.deleteAnalysis.hidden = state.demo;
   elements.favorite.setAttribute("aria-pressed", String(Boolean(job?.favorite)));
   elements.favorite.textContent = text(job?.favorite ? "favoriteRemove" : "favoriteAdd");
@@ -528,7 +548,7 @@ function renderAnalysis(analysisText, language, videoId) {
   elements.analysisText.classList.toggle("is-plain", sections.length === 0);
   if (!sections.length) { elements.analysisText.textContent = analysisText; return; }
   sections.forEach((section, index) => {
-    const card = document.createElement("details"); card.className = "analysis-section is-visible"; card.open = section.number === 2;
+    const card = document.createElement("details"); card.className = "analysis-section is-visible"; card.open = true;
     const header = document.createElement("summary"); header.className = "analysis-section-header";
     const number = document.createElement("span"); number.className = "analysis-section-number"; number.textContent = String(section.number).padStart(2, "0");
     const title = document.createElement("span"); title.className = "analysis-section-title"; title.textContent = section.heading;
@@ -628,7 +648,6 @@ async function loadHistory() {
 function historyMatches(item) {
   const search = elements.historySearch.value.trim().toLocaleLowerCase(state.language);
   const result = item.result;
-  if (elements.historyLanguage.value !== "all" && result?.language !== elements.historyLanguage.value) return false;
   if (elements.favoritesOnly.checked && !item.favorite) return false;
   if (!search) return true;
   return `${result?.video?.title || ""} ${result?.video?.canonicalUrl || ""}`.toLocaleLowerCase(state.language).includes(search);
@@ -651,21 +670,61 @@ function renderHistory() {
     const open = document.createElement("button"); open.type = "button"; open.textContent = item.status === "completed" ? text("openAnalysis") : text("resumeAnalysis");
     open.disabled = !["completed", "queued", "transcript_processing", "transcript_ready", "ai_processing"].includes(item.status);
     open.addEventListener("click", async () => {
-      if (item.status === "completed") {
-        const payload = await statusJob(item.id);
-        state.demo = false;
-        state.resultCache.set(
-          `${payload.job.result.video.videoId}:${payload.job.result.language}`,
-          { job: payload.job, result: payload.job.result },
-        );
-        renderResult(payload.job, payload.job.result);
-        elements.result.scrollIntoView({ behavior: "smooth" });
+      const readyLabel = item.status === "completed" ? text("openAnalysis") : text("resumeAnalysis");
+      setActionBusy(open, true, text("openingAnalysis"), readyLabel);
+      try {
+        if (item.status === "completed") {
+          const payload = await statusJob(item.id);
+          state.demo = false;
+          state.resultCache.set(
+            `${payload.job.result.video.videoId}:${payload.job.result.language}`,
+            { job: payload.job, result: payload.job.result },
+          );
+          renderResult(payload.job, payload.job.result);
+          elements.result.scrollIntoView({ behavior: "smooth" });
+        } else {
+          safeStorageSet("videoCompassActiveJob", item.id);
+          await runJob(item);
+        }
+      } catch (error) {
+        showHistoryStatus(error.message || text("historyActionFailed"), true);
+      } finally {
+        if (open.isConnected) setActionBusy(open, false, "", readyLabel);
       }
-      else { safeStorageSet("videoCompassActiveJob", item.id); await runJob(item); }
     });
-    const favorite = document.createElement("button"); favorite.type = "button"; favorite.textContent = item.favorite ? "★" : "☆"; favorite.setAttribute("aria-label", text(item.favorite ? "favoriteRemove" : "favoriteAdd"));
-    favorite.addEventListener("click", () => toggleFavorite(item));
-    actions.append(open, favorite); copy.append(title, meta, actions); card.append(image, copy); elements.historyList.append(card);
+    const favorite = document.createElement("button"); favorite.type = "button"; favorite.className = "history-favorite-button"; favorite.textContent = item.favorite ? "★" : "☆"; favorite.setAttribute("aria-label", text(item.favorite ? "favoriteRemove" : "favoriteAdd")); favorite.setAttribute("aria-pressed", String(item.favorite));
+    favorite.addEventListener("click", async () => {
+      const readyLabel = item.favorite ? "★" : "☆";
+      setActionBusy(favorite, true, "…", readyLabel);
+      try {
+        await toggleFavorite(item);
+        showHistoryStatus(text("favoriteSaved"));
+      } catch (error) {
+        if (favorite.isConnected) setActionBusy(favorite, false, "", readyLabel);
+        showHistoryStatus(error.message || text("historyActionFailed"), true);
+      }
+    });
+    const remove = document.createElement("button"); remove.type = "button"; remove.className = "history-delete-button"; remove.textContent = text("deleteHistory");
+    remove.addEventListener("click", async () => {
+      if (!confirm(text("confirmDeleteAnalysis"))) return;
+      setActionBusy(remove, true, text("deletingAnalysis"), text("deleteHistory"));
+      try {
+        await readApi(await fetch("/api/analysis/history", {
+          method: "DELETE", headers: { "Content-Type": "application/json", "Accept-Language": state.language },
+          credentials: "same-origin", body: JSON.stringify({ jobId: item.id }),
+        }));
+        if (state.currentJob?.id === item.id) clearCurrentResult();
+        state.history = state.history.filter((historyItem) => historyItem.id !== item.id);
+        card.classList.add("is-removing");
+        await wait(180);
+        renderHistory();
+        showHistoryStatus(text("historyDeleted"));
+      } catch (error) {
+        if (remove.isConnected) setActionBusy(remove, false, "", text("deleteHistory"));
+        showHistoryStatus(error.message || text("historyActionFailed"), true);
+      }
+    });
+    actions.append(open, favorite, remove); copy.append(title, meta, actions); card.append(image, copy); elements.historyList.append(card);
   });
 }
 
@@ -677,9 +736,13 @@ async function toggleFavorite(job = state.currentJob) {
     credentials: "same-origin", body: JSON.stringify({ jobId: job.id, favorite }),
   }));
   job.favorite = payload.favorite;
-  elements.favorite.setAttribute("aria-pressed", String(payload.favorite));
-  elements.favorite.textContent = text(payload.favorite ? "favoriteRemove" : "favoriteAdd");
+  if (state.currentJob?.id === job.id) {
+    state.currentJob.favorite = payload.favorite;
+    elements.favorite.setAttribute("aria-pressed", String(payload.favorite));
+    elements.favorite.textContent = text(payload.favorite ? "favoriteRemove" : "favoriteAdd");
+  }
   await loadHistory();
+  return payload.favorite;
 }
 
 async function deleteCurrentAnalysis() {
@@ -695,25 +758,6 @@ function download(name, content, type) {
   const url = URL.createObjectURL(new Blob([content], { type }));
   const link = document.createElement("a"); link.href = url; link.download = name; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1_000);
-}
-
-async function createShare() {
-  if (!state.currentJob?.id || state.demo) return;
-  const payload = await readApi(await fetch("/api/share", {
-    method: "POST", headers: { "Content-Type": "application/json", "Accept-Language": state.language },
-    credentials: "same-origin", body: JSON.stringify({ jobId: state.currentJob.id }),
-  }));
-  elements.shareLink.href = payload.url; elements.shareLink.textContent = payload.url;
-  elements.shareConfirmation.hidden = false; elements.revokeShare.hidden = false;
-}
-
-async function revokeShare() {
-  if (!state.currentJob?.id) return;
-  await readApi(await fetch("/api/share", {
-    method: "DELETE", headers: { "Content-Type": "application/json", "Accept-Language": state.language },
-    credentials: "same-origin", body: JSON.stringify({ jobId: state.currentJob.id }),
-  }));
-  elements.shareConfirmation.hidden = true; elements.revokeShare.hidden = true;
 }
 
 function demoResult() {
@@ -781,6 +825,20 @@ async function deleteAccount(event) {
   }
 }
 
+function closeExportMenu({ returnFocus = false } = {}) {
+  if (!elements.exportMenu.open) return;
+  elements.exportMenu.open = false;
+  if (returnFocus) elements.exportMenu.querySelector("summary")?.focus();
+}
+
+let headerAnimationFrame = 0;
+function updateStickyHeader() {
+  cancelAnimationFrame(headerAnimationFrame);
+  headerAnimationFrame = requestAnimationFrame(() => {
+    elements.siteHeader.classList.toggle("is-compact", window.scrollY > 18);
+  });
+}
+
 elements.form.addEventListener("submit", (event) => {
   event.preventDefault();
   const value = elements.url.value.trim();
@@ -819,17 +877,26 @@ elements.copy.addEventListener("click", async () => { if (!state.currentResult) 
 elements.textDownload.addEventListener("click", () => { if (!state.currentResult) return; download("videocompass-analysis.txt", state.currentResult.analysisText, "text/plain;charset=utf-8"); });
 elements.markdown.addEventListener("click", () => { if (!state.currentResult) return; download("videocompass-analysis.md", structuredAnalysisToMarkdown(state.currentResult.analysis, state.currentResult.language, state.currentResult.video), "text/markdown;charset=utf-8"); });
 elements.pdf.addEventListener("click", () => { if (state.currentJob?.id && !state.demo) window.location.assign(`/api/export/pdf?jobId=${encodeURIComponent(state.currentJob.id)}`); });
-elements.share.addEventListener("click", createShare); elements.revokeShare.addEventListener("click", revokeShare);
-elements.copyShare.addEventListener("click", () => navigator.clipboard.writeText(elements.shareLink.href));
 elements.deleteAnalysis.addEventListener("click", deleteCurrentAnalysis);
+elements.exportMenu.querySelector(".export-menu-popover").addEventListener("click", (event) => {
+  if (event.target.closest("button")) closeExportMenu();
+});
+document.addEventListener("pointerdown", (event) => {
+  if (elements.exportMenu.open && !elements.exportMenu.contains(event.target)) closeExportMenu();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && elements.exportMenu.open) closeExportMenu({ returnFocus: true });
+});
 elements.newAnalysis.addEventListener("click", () => { clearCurrentResult(); elements.url.focus(); $("#analyzer").scrollIntoView({ behavior: "smooth" }); });
 elements.historyButton.addEventListener("click", () => elements.historySection.scrollIntoView({ behavior: "smooth" }));
-[elements.historySearch, elements.historyLanguage, elements.favoritesOnly].forEach((control) => control.addEventListener("input", renderHistory));
+[elements.historySearch, elements.favoritesOnly].forEach((control) => control.addEventListener("input", renderHistory));
 elements.demo.addEventListener("click", showDemo);
 elements.deleteAccount.addEventListener("click", () => { elements.deleteAccountDialog.showModal(); renderDeleteTurnstile(); });
 elements.cancelDeleteAccount.addEventListener("click", () => { elements.deleteAccountDialog.close(); resetDeleteCaptcha(); });
 elements.deleteAccountForm.addEventListener("submit", deleteAccount);
+window.addEventListener("scroll", updateStickyHeader, { passive: true });
 
 translatePage(state.language);
+updateStickyHeader();
 loadConfig();
 loadSession();

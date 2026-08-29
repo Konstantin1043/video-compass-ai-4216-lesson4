@@ -27,6 +27,8 @@ const staticFiles = new Map([
   ["/privacy.js", ["privacy.js", "text/javascript; charset=utf-8"]],
   ["/share.html", ["share.html", "text/html; charset=utf-8"]],
   ["/share.js", ["share.js", "text/javascript; charset=utf-8"]],
+  ["/assets/hero-ai-flow-1200.webp", ["assets/hero-ai-flow-1200.webp", "image/webp"]],
+  ["/assets/hero-ai-flow-720.webp", ["assets/hero-ai-flow-720.webp", "image/webp"]],
   ["/lib/analysis-sections.js", ["lib/analysis-sections.js", "text/javascript; charset=utf-8"]],
   ["/lib/language.js", ["lib/language.js", "text/javascript; charset=utf-8"]],
   ["/lib/structured-analysis.js", ["lib/structured-analysis.js", "text/javascript; charset=utf-8"]],

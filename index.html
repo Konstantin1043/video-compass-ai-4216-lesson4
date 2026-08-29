@@ -21,40 +21,42 @@
   <body>
     <a class="skip-link" href="#analyzer" data-i18n="skipLink">Перейти к анализатору</a>
 
-    <header class="site-header">
-      <a
-        class="brand"
-        href="#top"
-        aria-label="VideoCompass AI — на главную"
-        data-i18n-aria-label="brandHome"
-      >
-        <span class="brand-mark" aria-hidden="true">VC</span>
-        <span>VideoCompass <b>AI</b></span>
-      </a>
-      <span class="course-label" data-i18n="tagline">Экономьте время на просмотре</span>
-      <div class="header-tools">
-        <div
-          class="language-switcher"
-          role="group"
-          aria-label="Выбор языка"
-          data-i18n-aria-label="languageGroup"
+    <header class="site-header" id="siteHeader">
+      <div class="site-header-inner">
+        <a
+          class="brand"
+          href="#top"
+          aria-label="VideoCompass AI — на главную"
+          data-i18n-aria-label="brandHome"
         >
-          <button type="button" data-language="ru" aria-label="Русский" title="Русский">RU</button>
-          <button type="button" data-language="en" aria-label="English" title="English">EN</button>
-          <button type="button" data-language="lv" aria-label="Latviešu" title="Latviešu">LV</button>
-        </div>
-        <button class="header-login" id="openAuthButton" type="button" data-i18n="signIn">
-          Войти
-        </button>
-        <div class="user-panel" id="userPanel" hidden>
-          <span class="credit-badge" id="creditBadge" aria-live="polite"></span>
-          <span class="user-email" id="userEmail"></span>
-          <button class="header-history" id="historyButton" type="button" data-i18n="historyTitle">
-            История
+          <span class="brand-mark" aria-hidden="true">VC</span>
+          <span>VideoCompass <b>AI</b></span>
+        </a>
+        <span class="course-label" data-i18n="tagline">Экономьте время на просмотре</span>
+        <div class="header-tools">
+          <div
+            class="language-switcher"
+            role="group"
+            aria-label="Выбор языка"
+            data-i18n-aria-label="languageGroup"
+          >
+            <button type="button" data-language="ru" aria-label="Русский" title="Русский">RU</button>
+            <button type="button" data-language="en" aria-label="English" title="English">EN</button>
+            <button type="button" data-language="lv" aria-label="Latviešu" title="Latviešu">LV</button>
+          </div>
+          <button class="header-login" id="openAuthButton" type="button" data-i18n="signIn">
+            Войти
           </button>
-          <button class="header-logout" id="logoutButton" type="button" data-i18n="signOut">
-            Выйти
-          </button>
+          <div class="user-panel" id="userPanel" hidden>
+            <span class="credit-badge" id="creditBadge" aria-live="polite"></span>
+            <span class="user-email" id="userEmail"></span>
+            <button class="header-history" id="historyButton" type="button" data-i18n="historyTitle">
+              История
+            </button>
+            <button class="header-logout" id="logoutButton" type="button" data-i18n="signOut">
+              Выйти
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -86,10 +88,19 @@
         </div>
 
         <div class="hero-aside" aria-hidden="true">
-          <div class="compass-card">
-            <span class="compass-ring"><i></i></span>
-            <p data-i18n="heroFrom">От ссылки</p>
-            <strong data-i18n="heroTo">к ясному выводу</strong>
+          <div class="hero-visual">
+            <picture>
+              <source media="(max-width: 680px)" srcset="/assets/hero-ai-flow-720.webp" />
+              <img
+                src="/assets/hero-ai-flow-1200.webp"
+                width="1200"
+                height="800"
+                alt=""
+                decoding="async"
+                fetchpriority="high"
+              />
+            </picture>
+            <span class="hero-visual-glow"></span>
           </div>
         </div>
       </section>
@@ -167,15 +178,13 @@
             </div>
             <div class="result-actions">
               <button class="secondary-button" id="favoriteButton" type="button" aria-pressed="false" data-i18n="favoriteAdd">В избранное</button>
-              <details class="export-menu">
-                <summary class="secondary-button" data-i18n="exportMenu">Экспорт и ссылка</summary>
+              <details class="export-menu" id="exportMenu">
+                <summary class="secondary-button" data-i18n="exportMenu">Экспорт</summary>
                 <div class="export-menu-popover">
                   <button id="copyButton" type="button" data-i18n="copyButton">Скопировать текст</button>
                   <button id="textButton" type="button" data-i18n="downloadText">Скачать текст</button>
                   <button id="markdownButton" type="button" data-i18n="downloadMarkdown">Скачать Markdown</button>
                   <button id="pdfButton" type="button" data-i18n="downloadPdf">Скачать PDF</button>
-                  <button id="shareButton" type="button" data-i18n="createShare">Создать публичную ссылку</button>
-                  <button id="revokeShareButton" type="button" data-i18n="revokeShare" hidden>Отозвать публичную ссылку</button>
                   <button class="danger-menu-item" id="deleteAnalysisButton" type="button" data-i18n="deleteAnalysis">Удалить анализ</button>
                 </div>
               </details>
@@ -265,12 +274,6 @@
             <ol class="chapters-list" id="chaptersList"></ol>
           </section>
 
-          <div class="share-confirmation" id="shareConfirmation" role="status" hidden>
-            <span data-i18n="shareReady">Публичная ссылка создана:</span>
-            <a id="shareLink" href="#" target="_blank" rel="noopener noreferrer"></a>
-            <button id="copyShareButton" type="button" data-i18n="copyLink">Копировать ссылку</button>
-          </div>
-
           <button class="text-button" id="newAnalysisButton" type="button" data-i18n="newAnalysis">
             ← Проанализировать другое видео
           </button>
@@ -285,12 +288,9 @@
         </div>
         <div class="history-controls">
           <input id="historySearch" type="search" data-i18n-placeholder="historySearchPlaceholder" placeholder="Название или ссылка" />
-          <select id="historyLanguageFilter" aria-label="Фильтр языка" data-i18n-aria-label="historyLanguageFilter">
-            <option value="all" data-i18n="allLanguages">Все языки</option>
-            <option value="ru">RU</option><option value="en">EN</option><option value="lv">LV</option>
-          </select>
           <label><input id="favoritesOnly" type="checkbox" /> <span data-i18n="favoritesOnly">Только избранные</span></label>
         </div>
+        <p class="history-status" id="historyStatus" role="status" aria-live="polite" hidden></p>
         <div class="history-list" id="historyList"></div>
         <p class="history-empty" id="historyEmpty" data-i18n="historyEmpty" hidden>Сохранённых анализов пока нет.</p>
         <button class="text-button danger-text" id="deleteAccountButton" type="button" data-i18n="deleteAccount">Удалить аккаунт и все данные</button>

@@ -45,6 +45,39 @@ test("интерфейс содержит историю, три вкладки,
   assert.match(html, /id="textButton"/);
   assert.match(html, /id="markdownButton"/);
   assert.match(html, /id="pdfButton"/);
+  assert.doesNotMatch(html, /id="shareButton"|id="shareConfirmation"/);
+});
+
+test("разделы открываются сразу, экспорт закрывается снаружи, а языковой фильтр удалён", async () => {
+  const [source, html] = await Promise.all([
+    readFile(appUrl, "utf8"),
+    readFile(htmlUrl, "utf8"),
+  ]);
+  assert.match(source, /card\.open = true/);
+  assert.match(source, /document\.addEventListener\("pointerdown"/);
+  assert.match(source, /event\.key === "Escape"/);
+  assert.match(source, /closeExportMenu/);
+  assert.doesNotMatch(html, /historyLanguageFilter/);
+});
+
+test("история содержит удаление с обратной связью, а шапка становится компактной", async () => {
+  const [source, html, styles] = await Promise.all([
+    readFile(appUrl, "utf8"),
+    readFile(htmlUrl, "utf8"),
+    readFile(stylesUrl, "utf8"),
+  ]);
+  assert.match(source, /history-delete-button/);
+  assert.match(source, /setActionBusy/);
+  assert.match(source, /method: "DELETE"/);
+  assert.match(html, /id="siteHeader"/);
+  assert.match(styles, /\.site-header\.is-compact/);
+  assert.match(styles, /\.history-card-actions button:active/);
+});
+
+test("главный экран использует оптимизированную AI-иллюстрацию", async () => {
+  const html = await readFile(htmlUrl, "utf8");
+  assert.match(html, /hero-ai-flow-1200\.webp/);
+  assert.match(html, /hero-ai-flow-720\.webp/);
 });
 
 test("клиентский код не исполняет AI-текст как HTML", async () => {

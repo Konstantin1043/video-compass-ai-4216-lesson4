@@ -73,6 +73,12 @@ test("описание процесса ориентировано на поль
   );
 });
 
+test("кнопка экспорта имеет короткое название во всех языках", () => {
+  assert.equal(UI_TRANSLATIONS.ru.exportMenu, "Экспорт");
+  assert.equal(UI_TRANSLATIONS.en.exportMenu, "Export");
+  assert.equal(UI_TRANSLATIONS.lv.exportMenu, "Eksportēt");
+});
+
 test("форматирует динамические UI и серверные сообщения", () => {
   assert.equal(uiText("en", "repeat", { seconds: 5 }), "Retry in 5 sec.");
   assert.match(serverMessage("lv", "TOO_MANY_REQUESTS", { seconds: 12 }), /12 sek/);

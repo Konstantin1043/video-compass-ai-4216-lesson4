@@ -5,7 +5,7 @@ import {
   jsonResponse,
   requestLanguage,
   serverMessage,
-} from "./helpers.js";
+} from "../../lib/auth-helpers.js";
 import { validateMutationRequest } from "../../lib/security.js";
 
 export function createLogoutHandler({ env = process.env, fetchImpl = globalThis.fetch } = {}) {

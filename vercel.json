@@ -4,7 +4,7 @@
     "api/analyze.js": {
       "maxDuration": 120
     },
-    "api/analysis/*.js": {
+    "api/analysis/[action].js": {
       "maxDuration": 90
     },
     "api/export/pdf.js": {

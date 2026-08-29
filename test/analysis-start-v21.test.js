@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createStartAnalysisHandler } from "../api/analysis/start.js";
+import { createStartAnalysisHandler } from "../lib/analysis-api/start.js";
 
 const user = { id: "11111111-1111-4111-8111-111111111111", email: "student@example.com" };
 const requestId = "123e4567-e89b-42d3-a456-426614174000";
@@ -103,4 +103,3 @@ test("дневной или месячный финансовый предел �
   assert.equal(reserved, 0);
   assert.equal(countCalls, 2);
 });
-

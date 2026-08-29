@@ -1,10 +1,20 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const appUrl = new URL("../app-v21.js", import.meta.url);
 const htmlUrl = new URL("../index.html", import.meta.url);
 const vercelUrl = new URL("../vercel.json", import.meta.url);
+
+async function listJavaScriptFiles(directoryUrl) {
+  const entries = await readdir(directoryUrl, { withFileTypes: true });
+  const nested = await Promise.all(entries.map(async (entry) => {
+    const entryUrl = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, directoryUrl);
+    if (entry.isDirectory()) return listJavaScriptFiles(entryUrl);
+    return entry.isFile() && entry.name.endsWith(".js") ? [entryUrl] : [];
+  }));
+  return nested.flat();
+}
 
 test("клиент использует устойчивые этапы и восстанавливает активное задание", async () => {
   const source = await readFile(appUrl, "utf8");
@@ -40,3 +50,8 @@ test("публичная ссылка переписывается на безо
   assert.match(csp, /challenges\.cloudflare\.com/);
 });
 
+test("проект укладывается в лимит 12 функций бесплатного тарифа Vercel", async () => {
+  const functions = await listJavaScriptFiles(new URL("../api/", import.meta.url));
+  assert.equal(functions.length, 12);
+  assert.ok(functions.some((fileUrl) => decodeURIComponent(fileUrl.pathname).endsWith("/analysis/[action].js")));
+});

@@ -4,10 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import analyzeFunction from "../api/analyze.js";
 import deleteAccountFunction from "../api/account/delete.js";
-import historyFunction from "../api/analysis/history.js";
-import startAnalysisFunction from "../api/analysis/start.js";
-import statusAnalysisFunction from "../api/analysis/status.js";
-import stepAnalysisFunction from "../api/analysis/step.js";
+import analysisFunction from "../api/analysis/[action].js";
 import loginFunction from "../api/auth/login.js";
 import logoutFunction from "../api/auth/logout.js";
 import registerFunction from "../api/auth/register.js";
@@ -39,10 +36,10 @@ const staticFiles = new Map([
 const apiFunctions = new Map([
   ["/api/analyze", analyzeFunction],
   ["/api/account/delete", deleteAccountFunction],
-  ["/api/analysis/history", historyFunction],
-  ["/api/analysis/start", startAnalysisFunction],
-  ["/api/analysis/status", statusAnalysisFunction],
-  ["/api/analysis/step", stepAnalysisFunction],
+  ["/api/analysis/history", analysisFunction],
+  ["/api/analysis/start", analysisFunction],
+  ["/api/analysis/status", analysisFunction],
+  ["/api/analysis/step", analysisFunction],
   ["/api/auth/login", loginFunction],
   ["/api/auth/logout", logoutFunction],
   ["/api/auth/register", registerFunction],

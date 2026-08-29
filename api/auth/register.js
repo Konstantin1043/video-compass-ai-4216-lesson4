@@ -9,7 +9,7 @@ import {
   serverMessage,
   sessionCookies,
   validateCredentials,
-} from "./helpers.js";
+} from "../../lib/auth-helpers.js";
 import { consumeDatabaseRateLimit, validateMutationRequest } from "../../lib/security.js";
 
 export function createRegisterHandler({ env = process.env, fetchImpl = globalThis.fetch } = {}) {

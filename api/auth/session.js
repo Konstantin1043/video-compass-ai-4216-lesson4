@@ -7,7 +7,7 @@ import {
   publicUser,
   requestLanguage,
   serverMessage,
-} from "./helpers.js";
+} from "../../lib/auth-helpers.js";
 
 export function createSessionHandler({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
   return async function session(request) {

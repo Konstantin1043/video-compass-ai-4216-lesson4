@@ -140,5 +140,25 @@ test("Supabase-ключи очищаются от случайных перен�
   await service.serviceRpc("consume_rate_limit", {});
 
   assert.equal(requestHeaders.apikey, "sb_secret_test");
-  assert.equal(requestHeaders.Authorization, "Bearer sb_secret_test");
+  assert.equal(requestHeaders.Authorization, undefined);
+});
+
+test("секретный Supabase-ключ не отправляется как Bearer JWT", async () => {
+  let requestHeaders;
+  const service = createSupabaseService({
+    env: {
+      SUPABASE_URL: "https://example.supabase.co",
+      SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test",
+      SUPABASE_SECRET_KEY: "sb_secret_test",
+    },
+    fetchImpl: async (_url, options) => {
+      requestHeaders = options.headers;
+      return Response.json({ id: "job-test" });
+    },
+  });
+
+  await service.serviceRequest("rest/v1/analysis_jobs?id=eq.job-test");
+
+  assert.equal(requestHeaders.apikey, "sb_secret_test");
+  assert.equal("Authorization" in requestHeaders, false);
 });

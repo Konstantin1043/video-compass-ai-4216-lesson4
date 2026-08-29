@@ -83,16 +83,9 @@ a {
 }
 
 .site-header {
-  position: sticky;
-  z-index: 60;
-  top: 0;
   width: 100%;
   background: rgba(245, 248, 252, 0.86);
   border-bottom: 1px solid rgba(19, 34, 56, 0.08);
-  backdrop-filter: blur(18px) saturate(150%);
-  transition:
-    background 180ms ease,
-    box-shadow 180ms ease;
 }
 
 .site-header-inner {
@@ -101,22 +94,12 @@ a {
   align-items: center;
   justify-content: space-between;
   min-height: 88px;
-  transition: min-height 180ms ease;
-}
-
-.site-header.is-compact {
-  background: rgba(255, 255, 255, 0.93);
-  box-shadow: 0 10px 30px rgba(20, 45, 78, 0.1);
-}
-
-.site-header.is-compact .site-header-inner {
-  min-height: 66px;
 }
 
 #analyzer,
 #result,
 #historySection {
-  scroll-margin-top: 90px;
+  scroll-margin-top: 24px;
 }
 
 .brand {
@@ -144,18 +127,6 @@ a {
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   box-shadow: 0 10px 24px rgba(23, 105, 224, 0.24);
-  transition:
-    width 180ms ease,
-    height 180ms ease,
-    border-radius 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.site-header.is-compact .brand-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
-  box-shadow: 0 7px 18px rgba(23, 105, 224, 0.2);
 }
 
 .course-label {
@@ -165,14 +136,6 @@ a {
   font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition:
-    color 180ms ease,
-    opacity 180ms ease;
-}
-
-.site-header.is-compact .course-label {
-  color: #76879b;
-  opacity: 0.82;
 }
 
 .language-switcher {
@@ -2117,10 +2080,6 @@ a:focus-visible {
   .site-header-inner {
     gap: 12px;
     min-height: 72px;
-  }
-
-  .site-header.is-compact .site-header-inner {
-    min-height: 62px;
   }
 
   .brand > span:last-child,

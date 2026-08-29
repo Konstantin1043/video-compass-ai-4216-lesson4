@@ -60,7 +60,7 @@ test("разделы открываются сразу, экспорт закр�
   assert.doesNotMatch(html, /historyLanguageFilter/);
 });
 
-test("история содержит удаление с обратной связью, а шапка становится компактной", async () => {
+test("история содержит удаление с обратной связью, а шапка прокручивается вместе со страницей", async () => {
   const [source, html, styles] = await Promise.all([
     readFile(appUrl, "utf8"),
     readFile(htmlUrl, "utf8"),
@@ -70,7 +70,10 @@ test("история содержит удаление с обратной св�
   assert.match(source, /setActionBusy/);
   assert.match(source, /method: "DELETE"/);
   assert.match(html, /id="siteHeader"/);
-  assert.match(styles, /\.site-header\.is-compact/);
+  assert.doesNotMatch(styles, /\.site-header\.is-compact/);
+  const headerStyles = styles.match(/\.site-header\s*\{([^}]*)\}/)?.[1] ?? "";
+  assert.doesNotMatch(headerStyles, /position:\s*sticky/);
+  assert.doesNotMatch(source, /updateStickyHeader|headerAnimationFrame/);
   assert.match(styles, /\.history-card-actions button:active/);
 });
 

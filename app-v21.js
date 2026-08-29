@@ -35,7 +35,6 @@ const elements = {
   historySection: $("#historySection"), historySearch: $("#historySearch"),
   favoritesOnly: $("#favoritesOnly"), historyStatus: $("#historyStatus"),
   historyList: $("#historyList"), historyEmpty: $("#historyEmpty"), demo: $("#demoButton"),
-  siteHeader: $("#siteHeader"),
   deleteAccount: $("#deleteAccountButton"), deleteAccountDialog: $("#deleteAccountDialog"),
   deleteAccountForm: $("#deleteAccountForm"), deleteAccountPassword: $("#deleteAccountPassword"),
   deleteAccountError: $("#deleteAccountError"), cancelDeleteAccount: $("#cancelDeleteAccount"),
@@ -831,14 +830,6 @@ function closeExportMenu({ returnFocus = false } = {}) {
   if (returnFocus) elements.exportMenu.querySelector("summary")?.focus();
 }
 
-let headerAnimationFrame = 0;
-function updateStickyHeader() {
-  cancelAnimationFrame(headerAnimationFrame);
-  headerAnimationFrame = requestAnimationFrame(() => {
-    elements.siteHeader.classList.toggle("is-compact", window.scrollY > 18);
-  });
-}
-
 elements.form.addEventListener("submit", (event) => {
   event.preventDefault();
   const value = elements.url.value.trim();
@@ -894,9 +885,7 @@ elements.demo.addEventListener("click", showDemo);
 elements.deleteAccount.addEventListener("click", () => { elements.deleteAccountDialog.showModal(); renderDeleteTurnstile(); });
 elements.cancelDeleteAccount.addEventListener("click", () => { elements.deleteAccountDialog.close(); resetDeleteCaptcha(); });
 elements.deleteAccountForm.addEventListener("submit", deleteAccount);
-window.addEventListener("scroll", updateStickyHeader, { passive: true });
 
 translatePage(state.language);
-updateStickyHeader();
 loadConfig();
 loadSession();

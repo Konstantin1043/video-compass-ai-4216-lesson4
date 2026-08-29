@@ -4,6 +4,7 @@ import test from "node:test";
 
 const appUrl = new URL("../app-v21.js", import.meta.url);
 const htmlUrl = new URL("../index.html", import.meta.url);
+const stylesUrl = new URL("../styles.css", import.meta.url);
 const vercelUrl = new URL("../vercel.json", import.meta.url);
 
 async function listJavaScriptFiles(directoryUrl) {
@@ -23,6 +24,17 @@ test("клиент использует устойчивые этапы и во�
   assert.match(source, /\/api\/analysis\/status/);
   assert.match(source, /videoCompassActiveJob/);
   assert.match(source, /resumeStoredJob/);
+});
+
+test("после завершения анализа индикатор останавливается и становится отметкой", async () => {
+  const [source, styles] = await Promise.all([
+    readFile(appUrl, "utf8"),
+    readFile(stylesUrl, "utf8"),
+  ]);
+  assert.match(source, /progress\.classList\.remove\("is-complete"\)/);
+  assert.match(source, /progress\.classList\.add\("is-complete"\)/);
+  assert.match(styles, /\.progress-panel\.is-complete \.spinner[\s\S]+animation: completion-mark/);
+  assert.match(styles, /\.progress-panel\.is-complete \.spinner::after[\s\S]+content: "✓"/);
 });
 
 test("интерфейс содержит историю, три вкладки, демонстрацию и три экспорта", async () => {

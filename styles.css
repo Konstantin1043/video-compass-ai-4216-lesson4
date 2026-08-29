@@ -730,12 +730,28 @@ a {
 }
 
 .spinner {
+  display: grid;
+  place-items: center;
   width: 38px;
   height: 38px;
   border: 3px solid #c3d8f2;
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 850ms linear infinite;
+}
+
+.progress-panel.is-complete .spinner {
+  border-color: var(--success);
+  color: #fff;
+  background: var(--success);
+  animation: completion-mark 280ms ease-out both;
+}
+
+.progress-panel.is-complete .spinner::after {
+  content: "✓";
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .progress-title {
@@ -1817,6 +1833,18 @@ a:focus-visible {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes completion-mark {
+  from {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 

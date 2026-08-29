@@ -63,6 +63,16 @@ test("UI-словари содержат одинаковый набор неп�
   }
 });
 
+test("описание процесса ориентировано на пользователя во всех языках", () => {
+  for (const language of ["ru", "en", "lv"]) {
+    assert.doesNotMatch(UI_TRANSLATIONS[language].processTwoText, /секрет|secret|slepen/i);
+  }
+  assert.equal(
+    UI_TRANSLATIONS.ru.processThreeText,
+    "Gemini анализирует транскрипт по заданным параметрам.",
+  );
+});
+
 test("форматирует динамические UI и серверные сообщения", () => {
   assert.equal(uiText("en", "repeat", { seconds: 5 }), "Retry in 5 sec.");
   assert.match(serverMessage("lv", "TOO_MANY_REQUESTS", { seconds: 12 }), /12 sek/);

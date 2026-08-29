@@ -337,6 +337,7 @@ function renderProgress(status) {
   const index = progressIndex(status);
   const titles = [text("progressOne"), text("progressTwo"), text("progressThree")];
   elements.progress.hidden = false;
+  elements.progress.classList.remove("is-complete");
   elements.progressTitle.textContent = titles[index];
   elements.progressSteps.forEach((step, position) => {
     step.classList.toggle("is-done", position < index);
@@ -431,6 +432,7 @@ function finishJob(job) {
   state.resultCache.set(key, { job, result: job.result });
   elements.url.value = job.result.video.canonicalUrl;
   elements.progressSteps.forEach((step) => { step.classList.remove("is-active"); step.classList.add("is-done"); });
+  elements.progress.classList.add("is-complete");
   elements.progressTitle.textContent = text("analysisReady");
   renderResult(job, job.result);
   elements.result.scrollIntoView({ behavior: "smooth", block: "start" });

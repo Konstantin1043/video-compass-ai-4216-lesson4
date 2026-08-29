@@ -45,3 +45,13 @@ test("служебные таблицы и функции закрыты от б
   assert.match(sql, /grant execute on function public\.cleanup_video_compass\(\) to service_role/i);
 });
 
+test("служебная роль получает минимальные права на таблицы анализа", async () => {
+  const sql = await readFile(migrationUrl, "utf8");
+  for (const table of ["analysis_results", "analysis_jobs", "analysis_shares", "rate_limit_events"]) {
+    assert.match(
+      sql,
+      new RegExp(`grant select, insert, update, delete on public\\.${table} to service_role`, "i"),
+    );
+  }
+  assert.doesNotMatch(sql, /grant all on public\.(analysis_results|analysis_jobs|analysis_shares|rate_limit_events)/i);
+});

@@ -107,6 +107,13 @@ revoke all on public.analysis_jobs from public, anon, authenticated;
 revoke all on public.analysis_shares from public, anon, authenticated;
 revoke all on public.rate_limit_events from public, anon, authenticated;
 
+-- The backend Secret key is translated by Supabase to the service_role role.
+-- Grant only the data operations used by the server; browser roles remain revoked.
+grant select, insert, update, delete on public.analysis_results to service_role;
+grant select, insert, update, delete on public.analysis_jobs to service_role;
+grant select, insert, update, delete on public.analysis_shares to service_role;
+grant select, insert, update, delete on public.rate_limit_events to service_role;
+
 create or replace function public.consume_rate_limit(
   p_scope text,
   p_key_hash text,

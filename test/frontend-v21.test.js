@@ -91,6 +91,23 @@ test("главный экран использует оптимизирован�
   assert.match(styles, /@media\s*\(max-width:\s*680px\)[\s\S]*\.hero h1\s*\{[\s\S]*font-size:\s*clamp\(2\.2rem,\s*10vw,\s*2\.5rem\)/);
 });
 
+test("преимущества выглядят как статичный список, а не как кнопки", async () => {
+  const [html, styles, translations] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(stylesUrl, "utf8"),
+    readFile(new URL("../lib/ui-translations.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(html, /benefitSummary[\s\S]+benefitIdeas[\s\S]+benefitScore/);
+  assert.doesNotMatch(html, /benefitQuestions/);
+  const benefitStyles = styles.match(/\.benefits li\s*\{([^}]*)\}/)?.[1] ?? "";
+  assert.match(benefitStyles, /background:\s*transparent/);
+  assert.match(benefitStyles, /border:\s*0/);
+  assert.match(benefitStyles, /border-radius:\s*0/);
+  assert.match(styles, /\.benefits li::before\s*\{[\s\S]*content:\s*"✓"/);
+  assert.doesNotMatch(styles, /\.benefits li:hover/);
+  assert.match(translations, /benefitIdeas:\s*"Ключевые идеи"[\s\S]+benefitIdeas:\s*"Key ideas"[\s\S]+benefitIdeas:\s*"Galvenās idejas"/);
+});
+
 test("раздел процесса показывает шесть адаптивных плиток без нумерации и рекламного подзаголовка", async () => {
   const [html, styles] = await Promise.all([
     readFile(htmlUrl, "utf8"),

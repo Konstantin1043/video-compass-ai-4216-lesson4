@@ -103,6 +103,7 @@ test("преимущества выглядят как статичный спи
   assert.match(benefitStyles, /background:\s*transparent/);
   assert.match(benefitStyles, /border:\s*0/);
   assert.match(benefitStyles, /border-radius:\s*0/);
+  assert.match(benefitStyles, /font-size:\s*0\.96rem/);
   assert.match(styles, /\.benefits li::before\s*\{[\s\S]*content:\s*"✓"/);
   assert.doesNotMatch(styles, /\.benefits li:hover/);
   assert.match(translations, /benefitIdeas:\s*"Ключевые идеи"[\s\S]+benefitIdeas:\s*"Key ideas"[\s\S]+benefitIdeas:\s*"Galvenās idejas"/);
@@ -198,6 +199,28 @@ test("панель пользователя не показывает подск
   assert.match(styles, /\.header-history,\s*\.header-logout\s*\{[\s\S]*font-size:\s*0\.86rem/);
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*\.header-logout\s*\{[\s\S]*font-size:\s*0\.78rem/);
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*\.credit-badge::after\s*\{[\s\S]*font-size:\s*0\.78rem/);
+});
+
+test("удаление аккаунта находится в подвале, а политика не описывает отсутствующие публичные ссылки", async () => {
+  const [source, html, privacy, translations, styles] = await Promise.all([
+    readFile(appUrl, "utf8"),
+    readFile(htmlUrl, "utf8"),
+    readFile(new URL("../privacy.html", import.meta.url), "utf8"),
+    readFile(new URL("../lib/ui-translations.js", import.meta.url), "utf8"),
+    readFile(stylesUrl, "utf8"),
+  ]);
+  const historyStart = html.indexOf('id="historySection"');
+  const processStart = html.indexOf('class="how-it-works"');
+  const footerStart = html.indexOf('class="site-footer"');
+  const deleteAccount = html.indexOf('id="deleteAccountButton"');
+  assert.ok(deleteAccount > footerStart);
+  assert.ok(deleteAccount < 0 || deleteAccount < historyStart || deleteAccount > processStart);
+  assert.match(source, /elements\.deleteAccount\.hidden = !authenticated/);
+  assert.match(styles, /\.footer-actions\s*\{[\s\S]*flex-direction:\s*column/);
+  assert.match(styles, /\.privacy-page\s*\{[\s\S]*calc\(100% - 48px\)[\s\S]*margin-inline:\s*auto/);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*\.privacy-page\s*\{[\s\S]*calc\(100% - 32px\)/);
+  assert.doesNotMatch(privacy, /Публичные ссылки|отозвать публичную ссылку|Public links expire|revoke a public link|Publiskās saites beidzas|atsaukt publisko saiti/i);
+  assert.doesNotMatch(translations, /deleteAccountText:[^\n]*(public links|публичные ссылки|publiskās saites)/i);
 });
 
 test("превью результата показывается целиком на компьютере и переносится над текстом на узких экранах", async () => {

@@ -317,7 +317,6 @@
         <p class="history-status" id="historyStatus" role="status" aria-live="polite" hidden></p>
         <div class="history-list" id="historyList"></div>
         <p class="history-empty" id="historyEmpty" data-i18n="historyEmpty" hidden>Сохранённых анализов пока нет.</p>
-        <button class="text-button danger-text" id="deleteAccountButton" type="button" data-i18n="deleteAccount">Удалить аккаунт и все данные</button>
       </section>
 
       <section class="how-it-works" aria-labelledby="how-title">
@@ -375,7 +374,10 @@
     <footer class="site-footer">
       <p data-i18n="footerProject">VideoCompass AI · учебный некоммерческий проект</p>
       <p data-i18n="footerDisclaimer">Результат AI может содержать неточности — сверяйте важные выводы с оригиналом.</p>
-      <a href="/privacy.html" data-i18n="privacyLink">Конфиденциальность</a>
+      <div class="footer-actions">
+        <a href="/privacy.html" data-i18n="privacyLink">Конфиденциальность</a>
+        <button class="footer-delete-account" id="deleteAccountButton" type="button" data-i18n="deleteAccount" hidden>Удалить аккаунт и все данные</button>
+      </div>
     </footer>
 
     <dialog class="auth-dialog" id="authDialog" aria-labelledby="authTitle">
@@ -433,7 +435,7 @@
     <dialog class="confirm-dialog" id="deleteAccountDialog" aria-labelledby="deleteAccountTitle">
       <form method="dialog" class="confirm-dialog-card" id="deleteAccountForm">
         <h2 id="deleteAccountTitle" data-i18n="deleteAccountTitle">Удалить аккаунт?</h2>
-        <p data-i18n="deleteAccountText">История, избранное и публичные ссылки будут удалены без возможности восстановления.</p>
+        <p data-i18n="deleteAccountText">История, избранное и данные аккаунта будут удалены без возможности восстановления.</p>
         <label for="deleteAccountPassword" data-i18n="confirmPassword">Введите пароль для подтверждения</label>
         <input id="deleteAccountPassword" type="password" autocomplete="current-password" minlength="8" required />
         <div id="deleteTurnstileWidget" class="turnstile-widget" hidden></div>

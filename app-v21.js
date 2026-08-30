@@ -232,6 +232,7 @@ function renderAuthState() {
   elements.authGateTitle.textContent = text(noCredits ? "noCreditsTitle" : "authGateTitle");
   elements.authGateText.textContent = text(noCredits ? "noCreditsText" : "authGateText");
   elements.historySection.hidden = !authenticated;
+  elements.deleteAccount.hidden = !authenticated;
   elements.url.disabled = state.sessionLoading;
   renderSubmitState();
 }

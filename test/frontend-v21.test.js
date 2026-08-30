@@ -78,9 +78,16 @@ test("история содержит удаление с обратной св�
 });
 
 test("главный экран использует оптимизированную AI-иллюстрацию", async () => {
-  const html = await readFile(htmlUrl, "utf8");
+  const [html, styles] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(stylesUrl, "utf8"),
+  ]);
   assert.match(html, /hero-ai-flow-1200\.webp/);
   assert.match(html, /hero-ai-flow-720\.webp/);
+  assert.match(styles, /\.hero\s*\{[\s\S]*grid-template-columns:\s*minmax\(0,\s*0\.9fr\)\s+minmax\(440px,\s*1\.1fr\)/);
+  assert.match(styles, /\.hero-visual\s*\{[\s\S]*width:\s*min\(100%,\s*620px\)/);
+  assert.match(styles, /\.hero h1\s*\{[\s\S]*"Aptos Display"[\s\S]*font-size:\s*clamp\(3\.35rem,\s*4\.8vw,\s*4\.75rem\)[\s\S]*font-weight:\s*680/);
+  assert.match(styles, /@media\s*\(max-width:\s*680px\)[\s\S]*\.hero h1\s*\{[\s\S]*font-size:\s*clamp\(2\.25rem,\s*11\.5vw,\s*3\.2rem\)/);
 });
 
 test("на мобильных устройствах кнопки языков заменяются выпадающим списком", async () => {

@@ -66,11 +66,9 @@ test("UI-словари содержат одинаковый набор неп�
 test("описание процесса ориентировано на пользователя во всех языках", () => {
   for (const language of ["ru", "en", "lv"]) {
     assert.doesNotMatch(UI_TRANSLATIONS[language].processTwoText, /секрет|secret|slepen/i);
+    assert.match(UI_TRANSLATIONS[language].processThreeText, /Gemini/);
+    assert.ok(UI_TRANSLATIONS[language].processSixText.length > 30);
   }
-  assert.equal(
-    UI_TRANSLATIONS.ru.processThreeText,
-    "Gemini анализирует транскрипт по заданным параметрам.",
-  );
 });
 
 test("кнопка экспорта имеет короткое название во всех языках", () => {

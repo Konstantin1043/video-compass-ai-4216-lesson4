@@ -302,29 +302,50 @@
           <p class="eyebrow" data-i18n="processEyebrow">Прозрачный процесс</p>
           <h2 id="how-title" data-i18n="processTitle">Как это работает</h2>
         </div>
-        <ol class="process-list">
-          <li>
-            <span>1</span>
-            <div>
-              <h3 data-i18n="processOneTitle">Проверяем ссылку</h3>
-              <p data-i18n="processOneText">Принимаем только одну корректную ссылку на публичный YouTube‑ролик.</p>
-            </div>
+        <ul class="process-grid">
+          <li class="process-card process-card-link">
+            <span class="process-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M10.2 13.8a4.5 4.5 0 0 0 6.4.1l2.2-2.2a4.5 4.5 0 0 0-6.4-6.4l-1.3 1.3"/><path d="M13.8 10.2a4.5 4.5 0 0 0-6.4-.1l-2.2 2.2a4.5 4.5 0 0 0 6.4 6.4l1.3-1.3"/></svg>
+            </span>
+            <h3 data-i18n="processOneTitle">Вставляйте ссылку</h3>
+            <p data-i18n="processOneText">Поддерживаются обычные ролики, Shorts и записи трансляций с доступными субтитрами.</p>
           </li>
-          <li>
-            <span>2</span>
-            <div>
-              <h3 data-i18n="processTwoTitle">Получаем текст</h3>
-              <p data-i18n="processTwoText">Apify извлекает доступные субтитры и преобразует их в текст.</p>
-            </div>
+          <li class="process-card process-card-transcript">
+            <span class="process-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 10h4M7 14h6M15 10h2M15 14h2"/></svg>
+            </span>
+            <h3 data-i18n="processTwoTitle">Получайте транскрипт</h3>
+            <p data-i18n="processTwoText">Apify извлекает доступные субтитры вместе с временными отметками.</p>
           </li>
-          <li>
-            <span>3</span>
-            <div>
-              <h3 data-i18n="processThreeTitle">Выделяем главное</h3>
-              <p data-i18n="processThreeText">Gemini анализирует транскрипт по заданным параметрам.</p>
-            </div>
+          <li class="process-card process-card-ai">
+            <span class="process-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M12 3l1.2 3.8L17 8l-3.8 1.2L12 13l-1.2-3.8L7 8l3.8-1.2L12 3Z"/><path d="M18.5 13l.7 2.3 2.3.7-2.3.7-.7 2.3-.7-2.3-2.3-.7 2.3-.7.7-2.3ZM6 14l.8 2.7 2.7.8-2.7.8L6 21l-.8-2.7-2.7-.8 2.7-.8L6 14Z"/></svg>
+            </span>
+            <h3 data-i18n="processThreeTitle">Выделяйте главное</h3>
+            <p data-i18n="processThreeText">Gemini готовит резюме, ключевые идеи, оценку пользы и вопросы для самопроверки.</p>
           </li>
-        </ol>
+          <li class="process-card process-card-timecodes">
+            <span class="process-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path class="icon-fill" d="m9.5 9.2 5.4 2.8-5.4 2.8V9.2Z"/></svg>
+            </span>
+            <h3 data-i18n="processFourTitle">Переходите по тайм-кодам</h3>
+            <p data-i18n="processFourText">Открывайте нужные моменты видео прямо из краткого резюме и глав.</p>
+          </li>
+          <li class="process-card process-card-language">
+            <span class="process-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.2 2.4 3.4 5.4 3.4 9S14.2 18.6 12 21M12 3C9.8 5.4 8.6 8.4 8.6 12s1.2 6.6 3.4 9"/></svg>
+            </span>
+            <h3 data-i18n="processFiveTitle">Выбирайте язык</h3>
+            <p data-i18n="processFiveText">Читайте интерфейс и получайте анализ на русском, английском или латышском.</p>
+          </li>
+          <li class="process-card process-card-save">
+            <span class="process-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h8l5.5 5.5v10A2.5 2.5 0 0 1 17.5 21h-11A2.5 2.5 0 0 1 4 18.5v-13Z"/><path d="M8 3v6h7V3.5M8 21v-7h8v7"/></svg>
+            </span>
+            <h3 data-i18n="processSixTitle">Сохраняйте результаты</h3>
+            <p data-i18n="processSixText">Возвращайтесь к истории, добавляйте избранное и экспортируйте результат в TXT, Markdown или PDF.</p>
+          </li>
+        </ul>
       </section>
     </main>
 

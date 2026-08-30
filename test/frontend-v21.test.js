@@ -91,6 +91,20 @@ test("главный экран использует оптимизирован�
   assert.match(styles, /@media\s*\(max-width:\s*680px\)[\s\S]*\.hero h1\s*\{[\s\S]*font-size:\s*clamp\(2\.2rem,\s*10vw,\s*2\.5rem\)/);
 });
 
+test("раздел процесса показывает шесть адаптивных плиток без нумерации и рекламного подзаголовка", async () => {
+  const [html, styles] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(stylesUrl, "utf8"),
+  ]);
+  assert.equal((html.match(/class="process-card /g) || []).length, 6);
+  assert.equal((html.match(/class="process-icon"/g) || []).length, 6);
+  assert.doesNotMatch(html, /<ol class="process-list"|<span>[1-6]<\/span>/);
+  assert.doesNotMatch(html, /От ссылки до понятного разбора/);
+  assert.match(styles, /\.process-grid\s*\{[\s\S]*grid-template-columns:\s*repeat\(3,/);
+  assert.match(styles, /\.process-card:hover\s*\{[\s\S]*translateY\(-5px\)/);
+  assert.match(styles, /@media\s*\(max-width:\s*680px\)[\s\S]*\.process-grid\s*\{[\s\S]*grid-template-columns:\s*1fr/);
+});
+
 test("единый выпадающий выбор языка расположен последним в шапке", async () => {
   const [source, html, styles] = await Promise.all([
     readFile(appUrl, "utf8"),

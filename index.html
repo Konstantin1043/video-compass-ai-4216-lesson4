@@ -33,28 +33,6 @@
         </a>
         <span class="course-label" data-i18n="tagline">Экономьте время на просмотре</span>
         <div class="header-tools">
-          <div
-            class="language-switcher"
-            role="group"
-            aria-label="Выбор языка"
-            data-i18n-aria-label="languageGroup"
-          >
-            <button type="button" data-language="ru" aria-label="Русский" title="Русский">RU</button>
-            <button type="button" data-language="en" aria-label="English" title="English">EN</button>
-            <button type="button" data-language="lv" aria-label="Latviešu" title="Latviešu">LV</button>
-          </div>
-          <label class="mobile-language-picker">
-            <span class="visually-hidden" data-i18n="languageGroup">Выбор языка</span>
-            <select
-              id="mobileLanguageSelect"
-              aria-label="Выбор языка"
-              data-i18n-aria-label="languageGroup"
-            >
-              <option value="ru">RU</option>
-              <option value="en">EN</option>
-              <option value="lv">LV</option>
-            </select>
-          </label>
           <button class="header-login" id="openAuthButton" type="button" data-i18n="signIn">
             Войти
           </button>
@@ -68,6 +46,18 @@
               Выйти
             </button>
           </div>
+          <label class="language-picker">
+            <span class="visually-hidden" data-i18n="languageGroup">Выбор языка</span>
+            <select
+              id="languageSelect"
+              aria-label="Выбор языка"
+              data-i18n-aria-label="languageGroup"
+            >
+              <option value="ru">RU</option>
+              <option value="en">EN</option>
+              <option value="lv">LV</option>
+            </select>
+          </label>
         </div>
       </div>
     </header>

@@ -141,64 +141,13 @@ a {
   text-transform: uppercase;
 }
 
-.language-switcher {
-  display: inline-flex;
-  flex: 0 0 auto;
-  gap: 3px;
-  padding: 4px;
-  background: rgba(220, 234, 255, 0.72);
-  border: 1px solid rgba(23, 105, 224, 0.12);
-  border-radius: 12px;
-}
-
-.language-switcher button {
-  display: grid;
-  width: 34px;
-  height: 32px;
-  padding: 0;
-  color: var(--muted);
-  background: transparent;
-  border: 0;
-  border-radius: 9px;
-  place-items: center;
-  font: inherit;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition:
-    color 160ms ease,
-    background 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.language-switcher button:hover:not(:disabled) {
-  color: var(--accent-dark);
-}
-
-.language-switcher button[aria-pressed="true"] {
-  color: #fff;
-  background: var(--accent);
-  box-shadow: 0 5px 14px rgba(23, 105, 224, 0.25);
-}
-
-.language-switcher button:focus-visible {
-  outline: 3px solid rgba(23, 105, 224, 0.28);
-  outline-offset: 2px;
-}
-
-.language-switcher button:disabled {
-  cursor: wait;
-  opacity: 0.64;
-}
-
-.mobile-language-picker {
+.language-picker {
   position: relative;
-  display: none;
+  display: block;
   flex: 0 0 auto;
 }
 
-.mobile-language-picker::after {
+.language-picker::after {
   position: absolute;
   top: 50%;
   right: 10px;
@@ -211,8 +160,8 @@ a {
   transform: translateY(-58%);
 }
 
-.mobile-language-picker select {
-  width: 66px;
+.language-picker select {
+  width: 68px;
   height: 42px;
   padding: 0 26px 0 12px;
   color: var(--accent-dark);
@@ -227,12 +176,17 @@ a {
   cursor: pointer;
 }
 
-.mobile-language-picker select:focus-visible {
+.language-picker select:hover:not(:disabled) {
+  background: #d7e7ff;
+  border-color: rgba(23, 105, 224, 0.32);
+}
+
+.language-picker select:focus-visible {
   outline: 3px solid rgba(23, 105, 224, 0.28);
   outline-offset: 2px;
 }
 
-.mobile-language-picker select:disabled {
+.language-picker select:disabled {
   cursor: wait;
   opacity: 0.64;
 }
@@ -2133,14 +2087,6 @@ a:focus-visible {
 
 @media (max-width: 680px),
   (max-width: 1180px) and (any-pointer: coarse) {
-  .language-switcher {
-    display: none;
-  }
-
-  .mobile-language-picker {
-    display: block;
-  }
-
   .brand-name {
     flex-direction: column;
     font-size: 0.8rem;
@@ -2196,14 +2142,14 @@ a:focus-visible {
     font-size: 0.72rem;
   }
 
-  .mobile-language-picker select {
+  .language-picker select {
     width: 60px;
     height: 40px;
     padding-inline: 10px 22px;
     font-size: 0.72rem;
   }
 
-  .mobile-language-picker::after {
+  .language-picker::after {
     right: 8px;
   }
 

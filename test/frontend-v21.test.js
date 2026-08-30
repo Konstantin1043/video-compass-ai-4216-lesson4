@@ -91,19 +91,24 @@ test("главный экран использует оптимизирован�
   assert.match(styles, /@media\s*\(max-width:\s*680px\)[\s\S]*\.hero h1\s*\{[\s\S]*font-size:\s*clamp\(2\.2rem,\s*10vw,\s*2\.5rem\)/);
 });
 
-test("на мобильных устройствах кнопки языков заменяются выпадающим списком", async () => {
+test("единый выпадающий выбор языка расположен последним в шапке", async () => {
   const [source, html, styles] = await Promise.all([
     readFile(appUrl, "utf8"),
     readFile(htmlUrl, "utf8"),
     readFile(stylesUrl, "utf8"),
   ]);
-  assert.match(html, /id="mobileLanguageSelect"/);
+  assert.match(html, /id="languageSelect"/);
   assert.equal((html.match(/<option value="(?:ru|en|lv)">/g) || []).length, 3);
-  assert.match(source, /elements\.mobileLanguage\.value = language/);
-  assert.match(source, /elements\.mobileLanguage\.addEventListener\("change"/);
-  assert.match(source, /elements\.mobileLanguage\.disabled = busy/);
-  assert.match(styles, /\.mobile-language-picker[\s\S]+display:\s*none/);
-  assert.match(styles, /max-width:\s*1180px[\s\S]+any-pointer:\s*coarse[\s\S]+\.language-switcher[\s\S]+display:\s*none/);
+  assert.doesNotMatch(html, /class="language-switcher"|mobileLanguageSelect/);
+  assert.match(html, /id="logoutButton"[\s\S]+class="language-picker"/);
+  assert.match(source, /elements\.languageSelect\.value = language/);
+  assert.match(source, /elements\.languageSelect\.addEventListener\("change"/);
+  assert.match(source, /elements\.languageSelect\.disabled = busy/);
+  assert.match(styles, /\.language-picker\s*\{[\s\S]+display:\s*block/);
+  assert.match(styles, /\.language-picker select\s*\{[\s\S]+appearance:\s*none/);
+  const privacy = await readFile(new URL("../privacy.html", import.meta.url), "utf8");
+  assert.match(privacy, /id="privacyLanguageSelect"/);
+  assert.doesNotMatch(privacy, /data-privacy-language/);
 });
 
 test("шапка не использует сокращение VC и компактно показывает бренд и кредиты на мобильных", async () => {

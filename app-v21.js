@@ -7,8 +7,7 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const elements = {
   form: $("#analyzerForm"), url: $("#youtubeUrl"), submit: $("#submitButton"),
-  submitLabel: $("#submitButton span"), languages: $$('[data-language]'),
-  mobileLanguage: $("#mobileLanguageSelect"),
+  submitLabel: $("#submitButton span"), languageSelect: $("#languageSelect"),
   error: $("#errorMessage"), errorText: $("#errorText"), progress: $("#progressPanel"),
   progressTitle: $("#progressTitle"), progressSteps: [$("#progressStep1"), $("#progressStep2"), $("#progressStep3")],
   result: $("#result"), thumbnail: $("#videoThumbnail"), videoTitle: $("#videoTitle"),
@@ -104,10 +103,7 @@ function translatePage(language) {
     const value = dictionary[node.dataset.i18nPlaceholder];
     if (typeof value === "string") node.placeholder = value;
   });
-  elements.languages.forEach((button) => {
-    button.setAttribute("aria-pressed", String(button.dataset.language === language));
-  });
-  elements.mobileLanguage.value = language;
+  elements.languageSelect.value = language;
   renderAuthMode();
   renderAuthState();
   renderHistory();
@@ -374,8 +370,7 @@ function renderProgress(status) {
 function setBusy(busy) {
   state.analyzing = busy;
   elements.form.setAttribute("aria-busy", String(busy));
-  elements.languages.forEach((button) => { button.disabled = busy; });
-  elements.mobileLanguage.disabled = busy;
+  elements.languageSelect.disabled = busy;
   renderSubmitState();
 }
 
@@ -848,8 +843,7 @@ elements.authModes.forEach((button) => button.addEventListener("click", () => { 
 elements.authForm.addEventListener("submit", (event) => { event.preventDefault(); submitAuth(); });
 elements.togglePassword.addEventListener("click", () => { const visible = elements.authPassword.type === "text"; elements.authPassword.type = visible ? "password" : "text"; elements.togglePassword.textContent = text(visible ? "showPassword" : "hidePassword"); });
 elements.logout.addEventListener("click", logout);
-elements.languages.forEach((button) => button.addEventListener("click", () => changeLanguage(button.dataset.language)));
-elements.mobileLanguage.addEventListener("change", () => changeLanguage(elements.mobileLanguage.value));
+elements.languageSelect.addEventListener("change", () => changeLanguage(elements.languageSelect.value));
 elements.resultTabs.forEach((button) => button.addEventListener("click", () => switchResultTab(button.dataset.resultTab)));
 elements.resultTabs.forEach((button, index) => button.addEventListener("keydown", (event) => {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;

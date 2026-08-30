@@ -1514,9 +1514,9 @@ a {
 
 .result-overview {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 24px;
-  align-items: center;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
   padding: 20px;
   margin-top: 30px;
   background: linear-gradient(135deg, #f4f8ff, #fbfdff);
@@ -1527,10 +1527,15 @@ a {
 .result-overview > img {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  background: #d5e1ed;
+  height: auto;
+  object-fit: contain;
+  background: #0b1220;
   border-radius: 14px;
+}
+
+.overview-copy {
+  min-width: 0;
+  padding-block: 4px;
 }
 
 .overview-copy h3 {
@@ -2121,6 +2126,15 @@ a:focus-visible {
 
   .history-list {
     grid-template-columns: 1fr;
+  }
+
+  .result-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .result-overview > img {
+    width: min(100%, 640px);
+    justify-self: center;
   }
 }
 

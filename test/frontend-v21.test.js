@@ -98,6 +98,17 @@ test("на мобильных устройствах кнопки языков �
   assert.match(styles, /max-width:\s*1180px[\s\S]+any-pointer:\s*coarse[\s\S]+\.language-switcher[\s\S]+display:\s*none/);
 });
 
+test("превью результата показывается целиком на компьютере и переносится над текстом на узких экранах", async () => {
+  const styles = await readFile(stylesUrl, "utf8");
+  const thumbnailStyles = styles.match(/\.result-overview\s*>\s*img\s*\{([^}]*)\}/)?.[1] ?? "";
+  assert.match(thumbnailStyles, /width:\s*100%/);
+  assert.match(thumbnailStyles, /height:\s*auto/);
+  assert.match(thumbnailStyles, /object-fit:\s*contain/);
+  assert.doesNotMatch(thumbnailStyles, /object-fit:\s*cover/);
+  assert.match(styles, /\.result-overview\s*\{[\s\S]*grid-template-columns:\s*minmax\(300px,\s*360px\)\s+minmax\(0,\s*1fr\)/);
+  assert.match(styles, /@media\s*\(max-width:\s*840px\)[\s\S]*\.result-overview\s*\{[\s\S]*grid-template-columns:\s*1fr/);
+});
+
 test("клиентский код не исполняет AI-текст как HTML", async () => {
   const source = await readFile(appUrl, "utf8");
   assert.doesNotMatch(source, /\.innerHTML\s*=|insertAdjacentHTML|document\.write/);

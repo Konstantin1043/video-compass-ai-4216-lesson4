@@ -8,6 +8,7 @@ const $$ = (selector) => [...document.querySelectorAll(selector)];
 const elements = {
   form: $("#analyzerForm"), url: $("#youtubeUrl"), submit: $("#submitButton"),
   submitLabel: $("#submitButton span"), languages: $$('[data-language]'),
+  mobileLanguage: $("#mobileLanguageSelect"),
   error: $("#errorMessage"), errorText: $("#errorText"), progress: $("#progressPanel"),
   progressTitle: $("#progressTitle"), progressSteps: [$("#progressStep1"), $("#progressStep2"), $("#progressStep3")],
   result: $("#result"), thumbnail: $("#videoThumbnail"), videoTitle: $("#videoTitle"),
@@ -106,6 +107,7 @@ function translatePage(language) {
   elements.languages.forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.language === language));
   });
+  elements.mobileLanguage.value = language;
   renderAuthMode();
   renderAuthState();
   renderHistory();
@@ -371,6 +373,7 @@ function setBusy(busy) {
   state.analyzing = busy;
   elements.form.setAttribute("aria-busy", String(busy));
   elements.languages.forEach((button) => { button.disabled = busy; });
+  elements.mobileLanguage.disabled = busy;
   renderSubmitState();
 }
 
@@ -844,6 +847,7 @@ elements.authForm.addEventListener("submit", (event) => { event.preventDefault()
 elements.togglePassword.addEventListener("click", () => { const visible = elements.authPassword.type === "text"; elements.authPassword.type = visible ? "password" : "text"; elements.togglePassword.textContent = text(visible ? "showPassword" : "hidePassword"); });
 elements.logout.addEventListener("click", logout);
 elements.languages.forEach((button) => button.addEventListener("click", () => changeLanguage(button.dataset.language)));
+elements.mobileLanguage.addEventListener("change", () => changeLanguage(elements.mobileLanguage.value));
 elements.resultTabs.forEach((button) => button.addEventListener("click", () => switchResultTab(button.dataset.resultTab)));
 elements.resultTabs.forEach((button, index) => button.addEventListener("keydown", (event) => {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;

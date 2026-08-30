@@ -83,6 +83,21 @@ test("главный экран использует оптимизирован�
   assert.match(html, /hero-ai-flow-720\.webp/);
 });
 
+test("на мобильных устройствах кнопки языков заменяются выпадающим списком", async () => {
+  const [source, html, styles] = await Promise.all([
+    readFile(appUrl, "utf8"),
+    readFile(htmlUrl, "utf8"),
+    readFile(stylesUrl, "utf8"),
+  ]);
+  assert.match(html, /id="mobileLanguageSelect"/);
+  assert.equal((html.match(/<option value="(?:ru|en|lv)">/g) || []).length, 3);
+  assert.match(source, /elements\.mobileLanguage\.value = language/);
+  assert.match(source, /elements\.mobileLanguage\.addEventListener\("change"/);
+  assert.match(source, /elements\.mobileLanguage\.disabled = busy/);
+  assert.match(styles, /\.mobile-language-picker[\s\S]+display:\s*none/);
+  assert.match(styles, /max-width:\s*1180px[\s\S]+any-pointer:\s*coarse[\s\S]+\.language-switcher[\s\S]+display:\s*none/);
+});
+
 test("клиентский код не исполняет AI-текст как HTML", async () => {
   const source = await readFile(appUrl, "utf8");
   assert.doesNotMatch(source, /\.innerHTML\s*=|insertAdjacentHTML|document\.write/);

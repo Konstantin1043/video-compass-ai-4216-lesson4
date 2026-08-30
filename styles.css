@@ -57,6 +57,17 @@ a {
   display: none !important;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .skip-link {
   position: fixed;
   z-index: 100;
@@ -185,6 +196,51 @@ a {
 }
 
 .language-switcher button:disabled {
+  cursor: wait;
+  opacity: 0.64;
+}
+
+.mobile-language-picker {
+  position: relative;
+  display: none;
+  flex: 0 0 auto;
+}
+
+.mobile-language-picker::after {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  color: var(--accent-dark);
+  content: "⌄";
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+  transform: translateY(-58%);
+}
+
+.mobile-language-picker select {
+  width: 66px;
+  height: 42px;
+  padding: 0 26px 0 12px;
+  color: var(--accent-dark);
+  background: var(--accent-soft);
+  border: 1px solid rgba(23, 105, 224, 0.2);
+  border-radius: 12px;
+  appearance: none;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.mobile-language-picker select:focus-visible {
+  outline: 3px solid rgba(23, 105, 224, 0.28);
+  outline-offset: 2px;
+}
+
+.mobile-language-picker select:disabled {
   cursor: wait;
   opacity: 0.64;
 }
@@ -2068,6 +2124,17 @@ a:focus-visible {
   }
 }
 
+@media (max-width: 680px),
+  (max-width: 1180px) and (any-pointer: coarse) {
+  .language-switcher {
+    display: none;
+  }
+
+  .mobile-language-picker {
+    display: block;
+  }
+}
+
 @media (max-width: 680px) {
   .site-header-inner,
   .hero,
@@ -2089,16 +2156,34 @@ a:focus-visible {
 
   .header-tools,
   .user-panel {
-    gap: 5px;
+    gap: 4px;
   }
 
   .header-login,
   .header-logout {
-    padding-inline: 10px;
+    padding-inline: 8px;
+    font-size: 0.72rem;
   }
 
   .credit-badge {
-    padding-inline: 8px;
+    padding-inline: 6px;
+    font-size: 0.7rem;
+  }
+
+  .header-history {
+    padding-inline: 6px;
+    font-size: 0.72rem;
+  }
+
+  .mobile-language-picker select {
+    width: 60px;
+    height: 40px;
+    padding-inline: 10px 22px;
+    font-size: 0.72rem;
+  }
+
+  .mobile-language-picker::after {
+    right: 8px;
   }
 
   .course-label {

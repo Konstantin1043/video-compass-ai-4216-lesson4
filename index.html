@@ -44,6 +44,18 @@
             <button type="button" data-language="en" aria-label="English" title="English">EN</button>
             <button type="button" data-language="lv" aria-label="Latviešu" title="Latviešu">LV</button>
           </div>
+          <label class="mobile-language-picker">
+            <span class="visually-hidden" data-i18n="languageGroup">Выбор языка</span>
+            <select
+              id="mobileLanguageSelect"
+              aria-label="Выбор языка"
+              data-i18n-aria-label="languageGroup"
+            >
+              <option value="ru">RU</option>
+              <option value="en">EN</option>
+              <option value="lv">LV</option>
+            </select>
+          </label>
           <button class="header-login" id="openAuthButton" type="button" data-i18n="signIn">
             Войти
           </button>

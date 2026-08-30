@@ -128,6 +128,7 @@ a {
 
 .brand-name {
   display: inline-flex;
+  font-size: 1.08rem;
   white-space: nowrap;
 }
 
@@ -2141,7 +2142,7 @@ a:focus-visible {
 
   .brand-name {
     flex-direction: column;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     line-height: 1.02;
     letter-spacing: -0.01em;
   }

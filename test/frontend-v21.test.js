@@ -111,8 +111,8 @@ test("шапка не использует сокращение VC и компа
     assert.match(page, /class="brand-name"/);
   }
   assert.doesNotMatch(styles, /\.brand-mark/);
-  assert.match(styles, /\.brand-name\s*\{[\s\S]*display:\s*inline-flex/);
-  assert.match(styles, /any-pointer:\s*coarse[\s\S]*\.brand-name\s*\{[\s\S]*flex-direction:\s*column/);
+  assert.match(styles, /\.brand-name\s*\{[\s\S]*display:\s*inline-flex[\s\S]*font-size:\s*1\.08rem/);
+  assert.match(styles, /any-pointer:\s*coarse[\s\S]*\.brand-name\s*\{[\s\S]*flex-direction:\s*column[\s\S]*font-size:\s*0\.8rem/);
   assert.match(styles, /\.credit-badge::after\s*\{[\s\S]*attr\(data-compact-label\)/);
   assert.match(source, /dataset\.compactLabel = authenticated \? `\$\{state\.user\.credits\}\/10`/);
 });

@@ -113,16 +113,24 @@ test("единый выпадающий выбор языка расположе
   ]);
   assert.match(html, /id="languageSelect"/);
   assert.equal((html.match(/<option value="(?:ru|en|lv)">/g) || []).length, 3);
+  assert.match(html, /class="language-icon"[\s\S]+<option value="lv">LV<\/option>[\s\S]+<option value="en">EN<\/option>[\s\S]+<option value="ru">RU<\/option>/);
   assert.doesNotMatch(html, /class="language-switcher"|mobileLanguageSelect/);
   assert.match(html, /id="logoutButton"[\s\S]+class="language-picker"/);
   assert.match(source, /elements\.languageSelect\.value = language/);
   assert.match(source, /elements\.languageSelect\.addEventListener\("change"/);
   assert.match(source, /elements\.languageSelect\.disabled = busy/);
-  assert.match(styles, /\.language-picker\s*\{[\s\S]+display:\s*block/);
+  assert.match(styles, /\.language-picker\s*\{[\s\S]+display:\s*inline-flex/);
+  assert.match(styles, /\.language-icon\s*\{[\s\S]+stroke:\s*currentColor/);
   assert.match(styles, /\.language-picker select\s*\{[\s\S]+appearance:\s*none/);
   const privacy = await readFile(new URL("../privacy.html", import.meta.url), "utf8");
   assert.match(privacy, /id="privacyLanguageSelect"/);
   assert.doesNotMatch(privacy, /data-privacy-language/);
+});
+
+test("история не оставляет избыточный промежуток перед плитками процесса", async () => {
+  const styles = await readFile(stylesUrl, "utf8");
+  assert.match(styles, /\.history-section\s*\{[\s\S]*padding:\s*70px 0 38px/);
+  assert.match(styles, /\.history-section:not\(\[hidden\]\) \+ \.how-it-works\s*\{[\s\S]*padding-top:\s*48px/);
 });
 
 test("шапка не использует сокращение VC и компактно показывает бренд и кредиты на мобильных", async () => {

@@ -143,15 +143,40 @@ a {
 
 .language-picker {
   position: relative;
-  display: block;
+  display: inline-flex;
   flex: 0 0 auto;
+  gap: 5px;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 4px 0 7px;
+  color: var(--muted);
+  border-radius: 10px;
+  transition:
+    color 160ms ease,
+    background 160ms ease;
+}
+
+.language-picker:hover {
+  color: var(--accent-dark);
+  background: rgba(23, 105, 224, 0.06);
+}
+
+.language-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 .language-picker::after {
   position: absolute;
   top: 50%;
-  right: 10px;
-  color: var(--accent-dark);
+  right: 3px;
+  color: currentColor;
   content: "⌄";
   font-size: 0.82rem;
   font-weight: 900;
@@ -161,13 +186,13 @@ a {
 }
 
 .language-picker select {
-  width: 68px;
-  height: 42px;
-  padding: 0 26px 0 12px;
-  color: var(--accent-dark);
-  background: var(--accent-soft);
-  border: 1px solid rgba(23, 105, 224, 0.2);
-  border-radius: 12px;
+  width: 42px;
+  height: 40px;
+  padding: 0 15px 0 1px;
+  color: currentColor;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
   appearance: none;
   font: inherit;
   font-size: 0.78rem;
@@ -177,13 +202,16 @@ a {
 }
 
 .language-picker select:hover:not(:disabled) {
-  background: #d7e7ff;
-  border-color: rgba(23, 105, 224, 0.32);
+  background: transparent;
+}
+
+.language-picker:focus-within {
+  outline: 3px solid rgba(23, 105, 224, 0.28);
+  outline-offset: 2px;
 }
 
 .language-picker select:focus-visible {
-  outline: 3px solid rgba(23, 105, 224, 0.28);
-  outline-offset: 2px;
+  outline: 0;
 }
 
 .language-picker select:disabled {
@@ -1787,12 +1815,16 @@ a {
 
 .history-section {
   width: min(calc(100% - 40px), var(--content-width));
-  padding: 70px 0 100px;
+  padding: 70px 0 38px;
   margin-inline: auto;
 }
 
 .history-section[hidden] {
   display: none;
+}
+
+.history-section:not([hidden]) + .how-it-works {
+  padding-top: 48px;
 }
 
 .history-intro p:last-child {
@@ -2225,14 +2257,23 @@ a:focus-visible {
   }
 
   .language-picker select {
-    width: 60px;
-    height: 40px;
-    padding-inline: 10px 22px;
+    width: 40px;
+    padding-inline: 1px 14px;
     font-size: 0.72rem;
   }
 
   .language-picker::after {
-    right: 8px;
+    right: 2px;
+  }
+
+  .language-picker {
+    gap: 3px;
+    padding-left: 4px;
+  }
+
+  .language-icon {
+    width: 15px;
+    height: 15px;
   }
 
   .course-label {

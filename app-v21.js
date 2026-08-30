@@ -203,6 +203,8 @@ function renderAuthState() {
   elements.userEmail.textContent = state.user?.email || "";
   elements.creditBadge.textContent = authenticated ? text("creditsCount", { count: state.user.credits }) : "";
   elements.creditBadge.title = authenticated ? text("creditsTitle", { count: state.user.credits }) : "";
+  elements.creditBadge.dataset.compactLabel = authenticated ? `${state.user.credits}/10` : "";
+  elements.creditBadge.setAttribute("aria-label", authenticated ? text("creditsTitle", { count: state.user.credits }) : "");
   elements.authGate.hidden = authenticated && !noCredits;
   elements.gateAuth.hidden = authenticated;
   elements.authGateTitle.textContent = text(noCredits ? "noCreditsTitle" : "authGateTitle");

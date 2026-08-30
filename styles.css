@@ -115,7 +115,6 @@ a {
 
 .brand {
   display: inline-flex;
-  gap: 12px;
   align-items: center;
   color: var(--ink);
   font-weight: 760;
@@ -127,17 +126,9 @@ a {
   color: var(--accent);
 }
 
-.brand-mark {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  color: #fff;
-  background: var(--accent);
-  border-radius: 13px;
-  place-items: center;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  box-shadow: 0 10px 24px rgba(23, 105, 224, 0.24);
+.brand-name {
+  display: inline-flex;
+  white-space: nowrap;
 }
 
 .course-label {
@@ -2147,6 +2138,22 @@ a:focus-visible {
   .mobile-language-picker {
     display: block;
   }
+
+  .brand-name {
+    flex-direction: column;
+    font-size: 0.72rem;
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+  }
+
+  .credit-badge {
+    font-size: 0;
+  }
+
+  .credit-badge::after {
+    content: attr(data-compact-label);
+    font-size: 0.72rem;
+  }
 }
 
 @media (max-width: 680px) {
@@ -2163,7 +2170,6 @@ a:focus-visible {
     min-height: 72px;
   }
 
-  .brand > span:last-child,
   .user-email {
     display: none;
   }
@@ -2181,7 +2187,6 @@ a:focus-visible {
 
   .credit-badge {
     padding-inline: 6px;
-    font-size: 0.7rem;
   }
 
   .header-history {

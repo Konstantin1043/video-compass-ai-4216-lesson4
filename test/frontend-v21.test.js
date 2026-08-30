@@ -98,6 +98,25 @@ test("на мобильных устройствах кнопки языков �
   assert.match(styles, /max-width:\s*1180px[\s\S]+any-pointer:\s*coarse[\s\S]+\.language-switcher[\s\S]+display:\s*none/);
 });
 
+test("шапка не использует сокращение VC и компактно показывает бренд и кредиты на мобильных", async () => {
+  const [source, html, privacy, share, styles] = await Promise.all([
+    readFile(appUrl, "utf8"),
+    readFile(htmlUrl, "utf8"),
+    readFile(new URL("../privacy.html", import.meta.url), "utf8"),
+    readFile(new URL("../share.html", import.meta.url), "utf8"),
+    readFile(stylesUrl, "utf8"),
+  ]);
+  for (const page of [html, privacy, share]) {
+    assert.doesNotMatch(page, />VC</);
+    assert.match(page, /class="brand-name"/);
+  }
+  assert.doesNotMatch(styles, /\.brand-mark/);
+  assert.match(styles, /\.brand-name\s*\{[\s\S]*display:\s*inline-flex/);
+  assert.match(styles, /any-pointer:\s*coarse[\s\S]*\.brand-name\s*\{[\s\S]*flex-direction:\s*column/);
+  assert.match(styles, /\.credit-badge::after\s*\{[\s\S]*attr\(data-compact-label\)/);
+  assert.match(source, /dataset\.compactLabel = authenticated \? `\$\{state\.user\.credits\}\/10`/);
+});
+
 test("превью результата показывается целиком на компьютере и переносится над текстом на узких экранах", async () => {
   const styles = await readFile(stylesUrl, "utf8");
   const thumbnailStyles = styles.match(/\.result-overview\s*>\s*img\s*\{([^}]*)\}/)?.[1] ?? "";

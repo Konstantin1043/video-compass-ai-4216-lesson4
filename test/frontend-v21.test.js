@@ -175,7 +175,12 @@ test("панель пользователя не показывает подск
   assert.match(creditStyles, /color:\s*var\(--accent-dark\)/);
   assert.match(creditStyles, /background:\s*transparent/);
   assert.match(creditStyles, /border:\s*0/);
+  assert.match(creditStyles, /font-size:\s*0\.86rem/);
+  assert.match(styles, /\.user-email\s*\{[\s\S]*font-size:\s*0\.86rem/);
   assert.match(styles, /\.header-history,\s*\.header-logout\s*\{[\s\S]*background:\s*transparent[\s\S]*border:\s*0/);
+  assert.match(styles, /\.header-history,\s*\.header-logout\s*\{[\s\S]*font-size:\s*0\.86rem/);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*\.header-logout\s*\{[\s\S]*font-size:\s*0\.78rem/);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*\.credit-badge::after\s*\{[\s\S]*font-size:\s*0\.78rem/);
 });
 
 test("превью результата показывается целиком на компьютере и переносится над текстом на узких экранах", async () => {

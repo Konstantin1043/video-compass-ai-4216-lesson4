@@ -162,6 +162,22 @@ test("шапка не использует сокращение VC и компа
   assert.match(source, /dataset\.compactLabel = authenticated \? `\$\{state\.user\.credits\}\/10`/);
 });
 
+test("панель пользователя не показывает подсказку и объединяет кредиты с историей", async () => {
+  const [source, html, styles] = await Promise.all([
+    readFile(appUrl, "utf8"),
+    readFile(htmlUrl, "utf8"),
+    readFile(stylesUrl, "utf8"),
+  ]);
+  assert.match(html, /id="creditBadge"[\s\S]+id="historyButton"[\s\S]+id="userEmail"[\s\S]+id="logoutButton"/);
+  assert.doesNotMatch(source, /creditBadge\.title\s*=/);
+  assert.match(source, /creditBadge\.removeAttribute\("title"\)/);
+  const creditStyles = styles.match(/\.credit-badge\s*\{([^}]*)\}/)?.[1] ?? "";
+  assert.match(creditStyles, /color:\s*var\(--accent-dark\)/);
+  assert.match(creditStyles, /background:\s*transparent/);
+  assert.match(creditStyles, /border:\s*0/);
+  assert.match(styles, /\.header-history,\s*\.header-logout\s*\{[\s\S]*background:\s*transparent[\s\S]*border:\s*0/);
+});
+
 test("превью результата показывается целиком на компьютере и переносится над текстом на узких экранах", async () => {
   const styles = await readFile(stylesUrl, "utf8");
   const thumbnailStyles = styles.match(/\.result-overview\s*>\s*img\s*\{([^}]*)\}/)?.[1] ?? "";

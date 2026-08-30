@@ -289,8 +289,7 @@ a {
   align-items: center;
 }
 
-.header-login,
-.header-logout {
+.header-login {
   min-height: 40px;
   padding: 0 15px;
   color: var(--accent-dark);
@@ -303,19 +302,17 @@ a {
   cursor: pointer;
 }
 
-.header-login:hover,
-.header-logout:hover {
+.header-login:hover {
   background: var(--accent-soft);
 }
 
 .credit-badge {
-  padding: 8px 11px;
-  color: #07553e;
-  background: #e5f7f0;
-  border: 1px solid rgba(11, 132, 91, 0.16);
-  border-radius: 999px;
-  font-size: 0.76rem;
-  font-weight: 800;
+  padding: 8px 7px;
+  color: var(--accent-dark);
+  background: transparent;
+  border: 0;
+  font-size: 0.78rem;
+  font-weight: 750;
   white-space: nowrap;
 }
 
@@ -1523,7 +1520,8 @@ a {
   font-weight: 700;
 }
 
-.header-history {
+.header-history,
+.header-logout {
   padding: 8px 10px;
   color: var(--accent-dark);
   background: transparent;
@@ -1535,7 +1533,8 @@ a {
   cursor: pointer;
 }
 
-.header-history:hover {
+.header-history:hover,
+.header-logout:hover {
   background: var(--accent-soft);
 }
 

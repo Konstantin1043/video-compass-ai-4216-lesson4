@@ -12,17 +12,33 @@
     <header class="site-header">
       <div class="site-header-inner">
         <a class="brand" href="/" aria-label="VideoCompass AI — на главную"><span class="brand-name" aria-hidden="true"><span>Video</span><span>Compass <b>AI</b></span></span></a>
-        <label class="language-picker">
-          <span class="visually-hidden">Language</span>
-          <svg class="language-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.2 2.4 3.4 5.4 3.4 9S14.2 18.6 12 21M12 3C9.8 5.4 8.6 8.4 8.6 12s1.2 6.6 3.4 9"/>
-          </svg>
-          <select id="privacyLanguageSelect" aria-label="Language">
-            <option value="lv">LV</option>
-            <option value="en">EN</option>
-            <option value="ru">RU</option>
-          </select>
-        </label>
+        <div class="language-picker">
+          <button
+            class="language-menu-button"
+            id="privacyLanguageMenuButton"
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="privacyLanguageMenu"
+            aria-label="Language"
+          >
+            <svg class="language-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.2 2.4 3.4 5.4 3.4 9S14.2 18.6 12 21M12 3C9.8 5.4 8.6 8.4 8.6 12s1.2 6.6 3.4 9"/>
+            </svg>
+            <span id="privacyLanguageCurrent">EN</span>
+          </button>
+          <div class="language-menu" id="privacyLanguageMenu" role="listbox" aria-label="Language" hidden>
+            <button type="button" role="option" data-privacy-language-option="lv" aria-selected="false">
+              <span class="language-code">LV</span><span>Latviešu</span><span class="language-check" aria-hidden="true">✓</span>
+            </button>
+            <button type="button" role="option" data-privacy-language-option="en" aria-selected="true">
+              <span class="language-code">EN</span><span>English</span><span class="language-check" aria-hidden="true">✓</span>
+            </button>
+            <button type="button" role="option" data-privacy-language-option="ru" aria-selected="false">
+              <span class="language-code">RU</span><span>Русский</span><span class="language-check" aria-hidden="true">✓</span>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
     <main class="privacy-page">

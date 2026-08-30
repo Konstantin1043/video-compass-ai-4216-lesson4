@@ -106,25 +106,35 @@ test("раздел процесса показывает шесть адапти
 });
 
 test("единый выпадающий выбор языка расположен последним в шапке", async () => {
-  const [source, html, styles] = await Promise.all([
+  const [source, html, styles, privacy, privacySource] = await Promise.all([
     readFile(appUrl, "utf8"),
     readFile(htmlUrl, "utf8"),
     readFile(stylesUrl, "utf8"),
+    readFile(new URL("../privacy.html", import.meta.url), "utf8"),
+    readFile(new URL("../privacy.js", import.meta.url), "utf8"),
   ]);
-  assert.match(html, /id="languageSelect"/);
-  assert.equal((html.match(/<option value="(?:ru|en|lv)">/g) || []).length, 3);
-  assert.match(html, /class="language-icon"[\s\S]+<option value="lv">LV<\/option>[\s\S]+<option value="en">EN<\/option>[\s\S]+<option value="ru">RU<\/option>/);
+  assert.match(html, /id="languageMenuButton"[\s\S]+id="languageMenu"/);
+  assert.equal((html.match(/data-language-option="(?:ru|en|lv)"/g) || []).length, 3);
+  assert.match(html, /data-language-option="lv"[\s\S]+Latviešu[\s\S]+data-language-option="en"[\s\S]+English[\s\S]+data-language-option="ru"[\s\S]+Русский/);
   assert.doesNotMatch(html, /class="language-switcher"|mobileLanguageSelect/);
+  assert.doesNotMatch(html, /<select|⌄|▼/);
   assert.match(html, /id="logoutButton"[\s\S]+class="language-picker"/);
-  assert.match(source, /elements\.languageSelect\.value = language/);
-  assert.match(source, /elements\.languageSelect\.addEventListener\("change"/);
-  assert.match(source, /elements\.languageSelect\.disabled = busy/);
+  assert.match(source, /elements\.languageCurrent\.textContent = language\.toUpperCase\(\)/);
+  assert.match(source, /option\.setAttribute\("aria-selected"/);
+  assert.match(source, /elements\.languageButton\.disabled = busy/);
+  assert.match(source, /setLanguageMenuOpen/);
+  assert.match(source, /document\.addEventListener\("pointerdown"[\s\S]+languageMenu\.parentElement/);
+  assert.match(source, /event\.key === "Escape"[\s\S]+setLanguageMenuOpen/);
   assert.match(styles, /\.language-picker\s*\{[\s\S]+display:\s*inline-flex/);
   assert.match(styles, /\.language-icon\s*\{[\s\S]+stroke:\s*currentColor/);
-  assert.match(styles, /\.language-picker select\s*\{[\s\S]+appearance:\s*none/);
-  const privacy = await readFile(new URL("../privacy.html", import.meta.url), "utf8");
-  assert.match(privacy, /id="privacyLanguageSelect"/);
-  assert.doesNotMatch(privacy, /data-privacy-language/);
+  assert.match(styles, /\.language-menu\s*\{[\s\S]+width:\s*190px/);
+  assert.match(styles, /\.language-menu\[hidden\]\s*\{[\s\S]+display:\s*none/);
+  assert.match(styles, /\.language-menu button\[aria-selected="true"\] \.language-check/);
+  assert.doesNotMatch(styles, /\.language-picker::after|content:\s*"⌄"/);
+  assert.match(privacy, /id="privacyLanguageMenuButton"[\s\S]+data-privacy-language-option="lv"[\s\S]+Latviešu/);
+  assert.doesNotMatch(privacy, /privacyLanguageSelect|<select/);
+  assert.match(privacySource, /setLanguageMenuOpen/);
+  assert.match(privacySource, /event\.key === "Escape"/);
 });
 
 test("история не оставляет избыточный промежуток перед плитками процесса", async () => {

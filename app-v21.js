@@ -7,7 +7,9 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const elements = {
   form: $("#analyzerForm"), url: $("#youtubeUrl"), submit: $("#submitButton"),
-  submitLabel: $("#submitButton span"), languageSelect: $("#languageSelect"),
+  submitLabel: $("#submitButton span"), languageButton: $("#languageMenuButton"),
+  languageCurrent: $("#languageCurrent"), languageMenu: $("#languageMenu"),
+  languageOptions: $$('[data-language-option]'),
   error: $("#errorMessage"), errorText: $("#errorText"), progress: $("#progressPanel"),
   progressTitle: $("#progressTitle"), progressSteps: [$("#progressStep1"), $("#progressStep2"), $("#progressStep3")],
   result: $("#result"), thumbnail: $("#videoThumbnail"), videoTitle: $("#videoTitle"),
@@ -83,6 +85,27 @@ function text(key, params = {}) {
   return uiText(state.language, key, params) || key;
 }
 
+function setLanguageMenuOpen(open, { focusSelected = false, returnFocus = false } = {}) {
+  elements.languageMenu.hidden = !open;
+  elements.languageButton.setAttribute("aria-expanded", String(open));
+  if (open && focusSelected) {
+    const selected = elements.languageOptions.find((option) => option.getAttribute("aria-selected") === "true");
+    (selected || elements.languageOptions[0])?.focus();
+  }
+  if (!open && returnFocus) elements.languageButton.focus();
+}
+
+function moveLanguageOptionFocus(key) {
+  const options = elements.languageOptions;
+  const currentIndex = Math.max(0, options.indexOf(document.activeElement));
+  const targetIndex = key === "Home"
+    ? 0
+    : key === "End"
+      ? options.length - 1
+      : (currentIndex + (key === "ArrowDown" ? 1 : -1) + options.length) % options.length;
+  options[targetIndex]?.focus();
+}
+
 function translatePage(language) {
   state.language = language;
   safeStorageSet("videoCompassLanguage", language);
@@ -103,7 +126,10 @@ function translatePage(language) {
     const value = dictionary[node.dataset.i18nPlaceholder];
     if (typeof value === "string") node.placeholder = value;
   });
-  elements.languageSelect.value = language;
+  elements.languageCurrent.textContent = language.toUpperCase();
+  elements.languageOptions.forEach((option) => {
+    option.setAttribute("aria-selected", String(option.dataset.languageOption === language));
+  });
   renderAuthMode();
   renderAuthState();
   renderHistory();
@@ -370,7 +396,8 @@ function renderProgress(status) {
 function setBusy(busy) {
   state.analyzing = busy;
   elements.form.setAttribute("aria-busy", String(busy));
-  elements.languageSelect.disabled = busy;
+  elements.languageButton.disabled = busy;
+  if (busy) setLanguageMenuOpen(false);
   renderSubmitState();
 }
 
@@ -843,7 +870,22 @@ elements.authModes.forEach((button) => button.addEventListener("click", () => { 
 elements.authForm.addEventListener("submit", (event) => { event.preventDefault(); submitAuth(); });
 elements.togglePassword.addEventListener("click", () => { const visible = elements.authPassword.type === "text"; elements.authPassword.type = visible ? "password" : "text"; elements.togglePassword.textContent = text(visible ? "showPassword" : "hidePassword"); });
 elements.logout.addEventListener("click", logout);
-elements.languageSelect.addEventListener("change", () => changeLanguage(elements.languageSelect.value));
+elements.languageButton.addEventListener("click", () => setLanguageMenuOpen(elements.languageMenu.hidden));
+elements.languageButton.addEventListener("keydown", (event) => {
+  if (!["ArrowDown", "ArrowUp"].includes(event.key)) return;
+  event.preventDefault();
+  setLanguageMenuOpen(true, { focusSelected: true });
+});
+elements.languageOptions.forEach((option) => option.addEventListener("click", async () => {
+  setLanguageMenuOpen(false, { returnFocus: true });
+  await changeLanguage(option.dataset.languageOption);
+}));
+elements.languageMenu.addEventListener("keydown", (event) => {
+  if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+    event.preventDefault();
+    moveLanguageOptionFocus(event.key);
+  }
+});
 elements.resultTabs.forEach((button) => button.addEventListener("click", () => switchResultTab(button.dataset.resultTab)));
 elements.resultTabs.forEach((button, index) => button.addEventListener("keydown", (event) => {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
@@ -874,9 +916,13 @@ elements.exportMenu.querySelector(".export-menu-popover").addEventListener("clic
 });
 document.addEventListener("pointerdown", (event) => {
   if (elements.exportMenu.open && !elements.exportMenu.contains(event.target)) closeExportMenu();
+  if (!elements.languageMenu.hidden && !elements.languageMenu.parentElement.contains(event.target)) {
+    setLanguageMenuOpen(false);
+  }
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && elements.exportMenu.open) closeExportMenu({ returnFocus: true });
+  if (event.key === "Escape" && !elements.languageMenu.hidden) setLanguageMenuOpen(false, { returnFocus: true });
 });
 elements.newAnalysis.addEventListener("click", () => { clearCurrentResult(); elements.url.focus(); $("#analyzer").scrollIntoView({ behavior: "smooth" }); });
 elements.historyButton.addEventListener("click", () => elements.historySection.scrollIntoView({ behavior: "smooth" }));

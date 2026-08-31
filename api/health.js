@@ -6,7 +6,7 @@ export default {
     const env = process.env;
     return jsonResponse({
       ok: true,
-      version: "2.1.0",
+      version: "2.2.0",
       services: {
         apify: Boolean(env.APIFY_API_TOKEN),
         gemini: Boolean(env.GEMINI_API_KEY),
@@ -17,4 +17,3 @@ export default {
     });
   },
 };
-

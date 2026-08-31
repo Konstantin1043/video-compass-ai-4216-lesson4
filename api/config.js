@@ -13,8 +13,7 @@ export default {
       captchaRequired: process.env.TURNSTILE_REQUIRED === "true",
       contactEmail: process.env.PUBLIC_CONTACT_EMAIL || "",
       controllerName: process.env.PUBLIC_CONTROLLER_NAME || "VideoCompass AI",
-      version: "2.1.0",
+      version: "2.2.0",
     });
   },
 };
-
